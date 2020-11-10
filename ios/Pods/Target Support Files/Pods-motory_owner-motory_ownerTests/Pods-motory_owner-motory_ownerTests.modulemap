@@ -1,0 +1,6 @@
+module Pods_motory_owner_motory_ownerTests {
+  umbrella header "Pods-motory_owner-motory_ownerTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
