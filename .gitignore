@@ -83,3 +83,15 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+bin
+config
+controller
+models
+node_modules
+public
+routes
+tt
+views
+app.js
+package-lock.json
+package.json
