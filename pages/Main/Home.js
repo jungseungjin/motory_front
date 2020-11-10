@@ -155,9 +155,6 @@ const Container_act = styled.View`
   align-items: center;
 `;
 function Home({navigation, route}) {
-  console.log('home');
-  console.log(route.params);
-  console.log('home');
   const [user, setUser] = React.useState([]);
   const [notice, setNotice] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -276,7 +273,7 @@ function Home({navigation, route}) {
               </ImageBackground>
             </MidbottomlefttopContainer>
             <MidbottomleftbottomContainer
-              onPress={() => navigation.navigate('Review')}>
+              onPress={() => navigation.navigate('Review', route.params)}>
               <ImageBackground
                 source={require('../../assets/image/background_4.png')}
                 style={{
