@@ -95,3 +95,5 @@ views
 app.js
 package-lock.json
 package.json
+net/
+.vscode/
