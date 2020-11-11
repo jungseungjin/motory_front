@@ -290,7 +290,7 @@ function Home({navigation, route}) {
           </MidbottomleftContainer>
           <MidbottomrightContainer>
             <MidbottomrighttopContainer
-              onPress={() => navigation.navigate('Reservation')}>
+              onPress={() => navigation.navigate('Reservation', route.params)}>
               <ImageBackground
                 source={require('../../assets/image/background_3.png')}
                 style={{

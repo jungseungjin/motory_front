@@ -389,7 +389,7 @@ function Review_detail({navigation, route}) {
       </TopContainer>
       <MidContainer>
         {sortData.map((item) => (
-          <MidmidContainer>
+          <MidmidContainer key={item._id}>
             <MidmidContainer_Top>
               <MidmidContainer_Top_left>
                 <FastImage
@@ -451,7 +451,7 @@ function Review_detail({navigation, route}) {
               <MidmidContainer_Mid_left></MidmidContainer_Mid_left>
               <MidmidContainer_Mid_right horizontal>
                 {item.review_reply_image.map((item2) => (
-                  <MidmidContainer_Mid_right_View>
+                  <MidmidContainer_Mid_right_View key={item2}>
                     <FastImage
                       //style={styles.image}
                       style={{
