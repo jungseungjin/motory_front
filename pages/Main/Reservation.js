@@ -89,8 +89,6 @@ const BottomBottomContainer_nest = styled.View`
   height: 100px;
   border: 1px solid #ff00ff;
   flex-direction: row;
-  margin-top: 10px;
-  margin-bottom: 10px;
 `;
 const BottomBottomContainer_nest_left = styled.View`
   flex: 1;
@@ -99,14 +97,14 @@ const BottomBottomContainer_nest_left = styled.View`
 const BottomBottomContainer_nest_left_text = styled.Text`
   color: #ffffff;
   text-align: right;
-  font-size: 20px;
+  font-size: 18px;
 `;
-const BottomBottomContainer_nest_left_image = styled.Image`
-  margin-top: 5px;
-  margin-bottom: 5px;
+const BottomBottomContainer_nest_right_image = styled.Image`
+  height: 100%;
 `;
 const BottomBottomContainer_nest_right = styled.View`
   flex: 4;
+  border: 1px solid #ff00ff;
   flex-direction: row;
 `;
 const BottomBottomContainer_nest_right_left = styled.View`
@@ -179,6 +177,7 @@ function Reservation({navigation, route}) {
   }); //한달의 예약있음 없음을 체크하는 객체 -> 뒤에서 만들어서 가져오자
   const [dayData, setDayData] = React.useState([]); //선택된날의 예약데이터
   const [storeData, setStoreData] = React.useState([]); //매장정보 가져오기
+  const [storeOneData, setStoreOneData] = React.useState([]); // 매장운영시간정보 ->selectDay의 요일에 맞춰서 변경
   /**dayData -> reservation_start_time으로 정렬하고 비교하는데 storeData시간 >  끝시간이면 해당 dayData는 바로 스킵 앞으로도 스킵
    * dayData[a].reservation_start_time : "0900"이런식으로 시작시간이 나옴
    *  dayData[a].works.store_work_time -> 작업시간
@@ -237,7 +236,6 @@ function Reservation({navigation, route}) {
         alert(result.data[0].message);
       } else {
         setDayData(result.data);
-        console.log(result.data);
         setIsLoading(false);
       }
     } catch (err) {
@@ -305,10 +303,20 @@ function Reservation({navigation, route}) {
     }
   };
   React.useEffect(() => {
-    get_data_store(); //영업시간이 언제부터 언제까지인지 알아야해서 필요 한번 호출하고 끝
     get_data_date(moment()); //오늘의 예약일정
+    get_data_store(); //영업시간이 언제부터 언제까지인지 알아야해서 필요 한번 호출하고 끝
     get_data_month(moment()); //이달의 예약일정
   }, []);
+  React.useEffect(() => {
+    let day = moment(selectDay).format('ddd').toLowerCase();
+    for (var a = 0; a < storeData.length; a++) {
+      if (day == storeData[a][0]) {
+        let new_data = storeData[a];
+        new_data.splice(0, 1);
+        setStoreOneData(new_data);
+      }
+    }
+  }, [dayData]);
   return (
     <Container>
       <TopContainer>
@@ -362,7 +370,7 @@ function Reservation({navigation, route}) {
               setCalendarArray(data);
               setSelectDay(day.dateString);
               get_data_date(day.dateString);
-              console.log(calendarArray);
+              //console.log(calendarArray);
             }}
             // 날짜를 길게(2~3초) 누르면 실행되는 함수. 기본값은 undefined입니다.
             // day 파라미터에는 위에서 말한 캘린더 객체가 들어갑니다. (Usage 바로 밑의 캘린더 객체)
@@ -423,46 +431,59 @@ function Reservation({navigation, route}) {
       <BottomContainer>
         <BottomTopContainer>
           <BottomTopContainer_Text>예약세부일정</BottomTopContainer_Text>
-          <BottomTopContainer_touch
-            onPress={() => {
-              alert('gd');
-            }}>
-            <BottomTopContainer_image
-              source={require('../../assets/image/edit.png')}></BottomTopContainer_image>
-          </BottomTopContainer_touch>
         </BottomTopContainer>
         <BottomBottomContainer>
-          <BottomBottomContainer_nest>
-            <BottomBottomContainer_nest_left>
-              <BottomBottomContainer_nest_left_text style={{marginTop: 10}}>
-                09:00 {'\n'} AM
-              </BottomBottomContainer_nest_left_text>
-              <BottomBottomContainer_nest_left_image
-                source={require('../../assets/image/right_bar.png')}></BottomBottomContainer_nest_left_image>
-            </BottomBottomContainer_nest_left>
-            <BottomBottomContainer_nest_right>
-              <BottomBottomContainer_nest_right_left>
-                <BottomBottomContainer_nest_right_left_text>
-                  백준열 고객
-                </BottomBottomContainer_nest_right_left_text>
-                <BottomBottomContainer_nest_right_left_text2>
-                  안녕하세요 작업내용이 들어갈 곳 입니다.
-                  우비ㅏ룿아ㅣㅁ루침아누치ㅏㅁ어뉘처무니춤너ㅣ춘머ㅣ춘머ㅣㅜㅍㅊㅁ니ㅓㅜ처ㅣㅁ뉘ㅓ
-                </BottomBottomContainer_nest_right_left_text2>
-              </BottomBottomContainer_nest_right_left>
-              <BottomBottomContainer_nest_right_right
-                onPress={() => {
-                  //navigation으로 넘어갈때 리스트의 아이디값을 가지고 넘어간다.
-                  navigation.navigate('Reservation_detail');
-                }}>
-                <BottomBottomContainer_nest_right_right_image
-                  source={require('../../assets/image/yellow_plus.png')}></BottomBottomContainer_nest_right_right_image>
-              </BottomBottomContainer_nest_right_right>
-            </BottomBottomContainer_nest_right>
-          </BottomBottomContainer_nest>
-          <BottomBottomContainer_nest></BottomBottomContainer_nest>
-          <BottomBottomContainer_nest></BottomBottomContainer_nest>
-          <BottomBottomContainer_nest></BottomBottomContainer_nest>
+          {storeOneData.map((item) => (
+            <BottomBottomContainer_nest key={item}>
+              <BottomBottomContainer_nest_left>
+                <BottomBottomContainer_nest_left_text style={{marginTop: 10}}>
+                  {moment(item, 'HHmm').format('HH:mm A')}
+                </BottomBottomContainer_nest_left_text>
+              </BottomBottomContainer_nest_left>
+              {dayData.map((item2) =>
+                item2.reservation_start_time == item ? (
+                  <BottomBottomContainer_nest_right
+                    key={item2.reservation_start_time}>
+                    <BottomBottomContainer_nest_right_image
+                      source={require('../../assets/image/green_bar.png')}></BottomBottomContainer_nest_right_image>
+                    <BottomBottomContainer_nest_right_left>
+                      <BottomBottomContainer_nest_right_left_text>
+                        {item2.users[0].iu_name} 고객
+                      </BottomBottomContainer_nest_right_left_text>
+                      <BottomBottomContainer_nest_right_left_text2>
+                        {item2.reservation_contents}
+                      </BottomBottomContainer_nest_right_left_text2>
+                    </BottomBottomContainer_nest_right_left>
+                    <BottomBottomContainer_nest_right_right
+                      onPress={() => {
+                        //navigation으로 넘어갈때 리스트의 아이디값을 가지고 넘어간다.
+                        navigation.navigate('Reservation_detail');
+                      }}>
+                      <BottomBottomContainer_nest_right_right_image
+                        source={require('../../assets/image/yellow_plus.png')}></BottomBottomContainer_nest_right_right_image>
+                    </BottomBottomContainer_nest_right_right>
+                  </BottomBottomContainer_nest_right>
+                ) : item2.reservation_start_time < item &&
+                  moment(item2.reservation_start_time, 'HHmm').format('HHmm') *
+                    1 +
+                    moment(
+                      item2.works[0].store_work_time
+                        .replace('시간', '')
+                        .replace(' ', '')
+                        .replace('분', ''),
+                      'HHmm',
+                    ).format('HHmm') *
+                      1 >
+                    item ? (
+                  <BottomBottomContainer_nest_right
+                    key={item2.reservation_start_time}>
+                    <BottomBottomContainer_nest_right_image
+                      source={require('../../assets/image/green_bar.png')}></BottomBottomContainer_nest_right_image>
+                  </BottomBottomContainer_nest_right>
+                ) : null,
+              )}
+            </BottomBottomContainer_nest>
+          ))}
         </BottomBottomContainer>
       </BottomContainer>
       {isLoading ? <Container_act></Container_act> : null}
