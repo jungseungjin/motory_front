@@ -178,43 +178,6 @@ function Reservation({navigation, route}) {
   const [dayData, setDayData] = React.useState([]); //선택된날의 예약데이터
   const [storeData, setStoreData] = React.useState([]); //매장정보 가져오기
   const [storeOneData, setStoreOneData] = React.useState([]); // 매장운영시간정보 ->selectDay의 요일에 맞춰서 변경
-  /**dayData -> reservation_start_time으로 정렬하고 비교하는데 storeData시간 >  끝시간이면 해당 dayData는 바로 스킵 앞으로도 스킵
-   * dayData[a].reservation_start_time : "0900"이런식으로 시작시간이 나옴
-   *  dayData[a].works.store_work_time -> 작업시간
-   * 시작시간+작업시간 해서 작업시작~끝시간 알아내고 그거로 아래 시간표랑 비교해서 샤바샤바
-   * if(시작시간 <= storeData시간 && 끝시간 > storeData시간){예약불가(시작시간부터 끝시간까지는 예약불가)
-   * }else{->시작시간 전이나 끝시간 이후는 예약가능
-   * }
-   * storeData의 길이만큼 요일 찾고
-   * 해당요일에서 storeData[요일]의 길이만큼 돌면서 시간비교
-   *
-   */
-  /*storeData
- [
-  [
-    1,       '0900', '0930',
-    '1000', '1030', '1100',
-    '1130', '1200', '1230',
-    '1300', '1330', '1400',
-    '1430', '1500', '1530',
-    '1600', '1630', '1700',
-    '1730', '1800', '1830',
-    '1900', '1930', '2000',
-    '2030', '2100'
-  ],
-  [
-    2,      '0900', '0930',
-    '1000', '1030', '1100',
-    '1130', '1200', '1230',
-    '1300', '1330', '1400',
-    '1430', '1500', '1530',
-    '1600', '1630', '1700',
-    '1730', '1800', '1830',
-    '1900', '1930', '2000',
-    '2030', '2100'
-  ],
-]
- */
   //선택된날의 예약데이터 가져오기
   const get_data_date = async function (data) {
     try {
@@ -445,7 +408,7 @@ function Reservation({navigation, route}) {
                   <BottomBottomContainer_nest_right
                     key={item2.reservation_start_time}>
                     <BottomBottomContainer_nest_right_image
-                      source={require('../../assets/image/green_bar.png')}></BottomBottomContainer_nest_right_image>
+                      source={require('../../assets/image/gray_bar.png')}></BottomBottomContainer_nest_right_image>
                     <BottomBottomContainer_nest_right_left>
                       <BottomBottomContainer_nest_right_left_text>
                         {item2.users[0].iu_name} 고객
@@ -456,8 +419,7 @@ function Reservation({navigation, route}) {
                     </BottomBottomContainer_nest_right_left>
                     <BottomBottomContainer_nest_right_right
                       onPress={() => {
-                        //navigation으로 넘어갈때 리스트의 아이디값을 가지고 넘어간다.
-                        navigation.navigate('Reservation_detail');
+                        navigation.navigate('Reservation_detail', item2);
                       }}>
                       <BottomBottomContainer_nest_right_right_image
                         source={require('../../assets/image/yellow_plus.png')}></BottomBottomContainer_nest_right_right_image>
@@ -478,7 +440,7 @@ function Reservation({navigation, route}) {
                   <BottomBottomContainer_nest_right
                     key={item2.reservation_start_time}>
                     <BottomBottomContainer_nest_right_image
-                      source={require('../../assets/image/green_bar.png')}></BottomBottomContainer_nest_right_image>
+                      source={require('../../assets/image/gray_bar.png')}></BottomBottomContainer_nest_right_image>
                   </BottomBottomContainer_nest_right>
                 ) : null,
               )}
