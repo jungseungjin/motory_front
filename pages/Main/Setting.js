@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import AsyncStorage from '@react-native-community/async-storage';
+import Container_act from '../../components/Main/Container_act';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -83,7 +85,12 @@ const MidContainer_Mid_Right = styled.View`
   width: 20%;
 `;
 const MidContainer_Mid_Right_Image = styled.Image``;
-function setting({navigation}) {
+function setting({navigation, route}) {
+  console.log('setting');
+  console.log(route);
+  console.log('setting');
+  const [isLoading, setIsLoading] = React.useState(false);
+
   return (
     <Container>
       <TopContainer>
@@ -122,7 +129,7 @@ function setting({navigation}) {
         </MidContainer_Mid>
         <MidContainer_Mid>
           <MidContainer_Mid_Left>
-            <MidContainer_Mid_Left_Text>채팅알림</MidContainer_Mid_Left_Text>
+            <MidContainer_Mid_Left_Text>쪽지알림</MidContainer_Mid_Left_Text>
           </MidContainer_Mid_Left>
           <MidContainer_Mid_Right>
             <MidContainer_Mid_Right_Image
@@ -141,6 +148,7 @@ function setting({navigation}) {
           </MidContainer_Mid_Right>
         </MidContainer_Mid>
       </MidContainer>
+      {isLoading ? <Container_act></Container_act> : null}
     </Container>
   );
 }

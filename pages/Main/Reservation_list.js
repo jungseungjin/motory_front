@@ -1,5 +1,12 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import {RefreshControl} from 'react-native';
+import moment from 'moment';
+import Domain from '../../net/Domain';
+import Key from '../../net/Key';
+import axios from 'axios';
+import Container_act from '../../components/Main/Container_act';
+import FastImage from 'react-native-fast-image';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -149,8 +156,66 @@ const MidmidContainer_right_mid_image = styled.Image`
   width: 20px;
   height: 20px;
 `;
-function Reservation_list({navigation}) {
+function Reservation_list({navigation, route}) {
+  console.log('reservation_list');
+  console.log(route);
+  console.log('reservation_list');
   const [page, setPage] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [showData, setShowData] = React.useState([]);
+  const [page0Data, setPage0Data] = React.useState([]);
+  const [page1Data, setPage1Data] = React.useState([]);
+
+  const get_data = async function () {
+    try {
+      setIsLoading(true);
+      let url =
+        Domain +
+        'reservation_list' +
+        '?key=' +
+        Key +
+        '&user_id=' +
+        route.params.user_id;
+
+      let result = await axios.get(url);
+
+      if (result.data[0].type == 0) {
+        setIsLoading(false);
+        alert(result.data[0].message);
+      } else {
+        let page0 = [];
+        let page1 = [];
+        for (var a = 0; a < result.data.length; a++) {
+          if (result.data[a].message == 'ok') {
+          } else {
+            if (result.data[a].reservation_type == 5) {
+              page1.push(result.data[a]);
+            } else {
+              page0.push(result.data[a]);
+            }
+          }
+        }
+        setPage(0);
+        setShowData(page0);
+        setPage0Data(page0);
+        setPage1Data(page1);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setIsLoading(false);
+      console.log(err);
+      alert(err);
+    }
+  };
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    get_data();
+    setRefreshing(false);
+  }, []);
+  React.useEffect(() => {
+    get_data();
+  }, []);
   return (
     <Container>
       <TopContainer>
@@ -161,87 +226,154 @@ function Reservation_list({navigation}) {
           <ToptoprightrightContainer></ToptoprightrightContainer>
         </ToptopContainer>
         <TopbottomContainer>
-          {page == 0 ? (
-            <>
-              <TopbottomleftContainer style={{borderBottomColor: '#000000'}}>
-                <TopbottomleftText>작업예정</TopbottomleftText>
-              </TopbottomleftContainer>
-              <TopbottomleftContainer
-                onPress={() => {
-                  setPage(1);
-                }}
-                style={{borderBottomColor: '#aaaaaa'}}>
-                <TopbottomleftText>작업완료</TopbottomleftText>
-              </TopbottomleftContainer>
-            </>
-          ) : page == 1 ? (
-            <>
-              <TopbottomleftContainer
-                onPress={() => {
-                  setPage(0);
-                }}
-                style={{borderBottomColor: '#aaaaaa'}}>
-                <TopbottomleftText>작업예정</TopbottomleftText>
-              </TopbottomleftContainer>
-              <TopbottomleftContainer style={{borderBottomColor: '#000000'}}>
-                <TopbottomleftText>작업완료</TopbottomleftText>
-              </TopbottomleftContainer>
-            </>
-          ) : null}
+          <TopbottomleftContainer
+            onPress={() => {
+              if (page == 1) {
+                setPage(0);
+                setShowData(page0Data);
+              }
+            }}
+            style={
+              page == 0
+                ? {borderBottomColor: '#000000'}
+                : page == 1
+                ? {borderBottomColor: '#aaaaaa'}
+                : null
+            }>
+            <TopbottomleftText
+              style={
+                page == 0
+                  ? {color: '#000000'}
+                  : page == 1
+                  ? {color: '#aaaaaa'}
+                  : null
+              }>
+              작업예정
+            </TopbottomleftText>
+          </TopbottomleftContainer>
+          <TopbottomleftContainer
+            onPress={() => {
+              if (page == 0) {
+                setPage(1);
+                setShowData(page1Data);
+              }
+            }}
+            style={
+              page == 0
+                ? {borderBottomColor: '#aaaaaa'}
+                : page == 1
+                ? {borderBottomColor: '#000000'}
+                : null
+            }>
+            <TopbottomleftText
+              style={
+                page == 0
+                  ? {color: '#aaaaaa'}
+                  : page == 1
+                  ? {color: '#000000'}
+                  : null
+              }>
+              작업완료
+            </TopbottomleftText>
+          </TopbottomleftContainer>
         </TopbottomContainer>
       </TopContainer>
-      <MidContainer>
-        <MidmidContainer
-          onPress={() => {
-            navigation.navigate('Reservation_detail');
-          }}>
-          <MidmidContainer_left>
-            <MidmidContainer_left_image
-              source={require('../../assets/image/Group24.png')}></MidmidContainer_left_image>
-          </MidmidContainer_left>
-          <MidmidContainer_mid>
-            <MidmidContainer_mid_top></MidmidContainer_mid_top>
-            <MidmidContainer_mid_top>
-              <MidmidContainer_mid_top_left>
-                <MidmidContainer_mid_top_left_text>
-                  작업명 :{' '}
-                </MidmidContainer_mid_top_left_text>
-              </MidmidContainer_mid_top_left>
-              <MidmidContainer_mid_top_right>
-                <MidmidContainer_mid_top_right_Text>
-                  G70 카나드 콘 바디킷
-                </MidmidContainer_mid_top_right_Text>
-              </MidmidContainer_mid_top_right>
-            </MidmidContainer_mid_top>
-            <MidmidContainer_mid_top>
-              <MidmidContainer_mid_top_left>
-                <MidmidContainer_mid_top_left_text>
-                  차종 :{' '}
-                </MidmidContainer_mid_top_left_text>
-              </MidmidContainer_mid_top_left>
-              <MidmidContainer_mid_top_right>
-                <MidmidContainer_mid_top_right_Text>
-                  2018년형 제네시스 G70
-                </MidmidContainer_mid_top_right_Text>
-              </MidmidContainer_mid_top_right>
-            </MidmidContainer_mid_top>
-            <MidmidContainer_mid_top>
-              <MidmidContainer_mid_top_left>
-                <MidmidContainer_mid_top_left_text
-                  style={{fontWeight: 'normal', fontSize: 10}}>
-                  예약일정 :{' '}
-                </MidmidContainer_mid_top_left_text>
-              </MidmidContainer_mid_top_left>
-              <MidmidContainer_mid_top_right>
-                <MidmidContainer_mid_top_right_Text style={{fontSize: 10}}>
-                  2020년 08월 02일 10:00 ~ 12:00 고객명 : 백준열
-                </MidmidContainer_mid_top_right_Text>
-              </MidmidContainer_mid_top_right>
-            </MidmidContainer_mid_top>
-            <MidmidContainer_mid_top></MidmidContainer_mid_top>
-          </MidmidContainer_mid>
-        </MidmidContainer>
+      <MidContainer
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+        {showData.map((item) => (
+          <MidmidContainer
+            key={item._id}
+            onPress={() => {
+              navigation.navigate('Reservation_detail', item);
+            }}>
+            <MidmidContainer_left>
+              <FastImage
+                //style={styles.image}
+                style={{
+                  width: 45,
+                  height: 45,
+                  marginTop: 'auto',
+                  marginBottom: 'auto',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                }}
+                source={{
+                  uri: item.users[0].review_user_iu_image,
+                  //headers: {Authorization: 'someAuthToken'},
+                  priority: FastImage.priority.normal,
+                }}
+                resizeMode={FastImage.resizeMode.contain}
+                //'stretch'
+              />
+            </MidmidContainer_left>
+            <MidmidContainer_mid>
+              <MidmidContainer_mid_top></MidmidContainer_mid_top>
+              <MidmidContainer_mid_top>
+                <MidmidContainer_mid_top_left>
+                  <MidmidContainer_mid_top_left_text>
+                    작업명 :{' '}
+                  </MidmidContainer_mid_top_left_text>
+                </MidmidContainer_mid_top_left>
+                <MidmidContainer_mid_top_right>
+                  <MidmidContainer_mid_top_right_Text>
+                    {item.works[0].store_work_name}
+                  </MidmidContainer_mid_top_right_Text>
+                </MidmidContainer_mid_top_right>
+              </MidmidContainer_mid_top>
+              <MidmidContainer_mid_top>
+                <MidmidContainer_mid_top_left>
+                  <MidmidContainer_mid_top_left_text>
+                    차종 :{' '}
+                  </MidmidContainer_mid_top_left_text>
+                </MidmidContainer_mid_top_left>
+                <MidmidContainer_mid_top_right>
+                  <MidmidContainer_mid_top_right_Text>
+                    {item.cars[0].model},{item.cars[0].grade},
+                    {item.cars[0].grade_detail}
+                  </MidmidContainer_mid_top_right_Text>
+                </MidmidContainer_mid_top_right>
+              </MidmidContainer_mid_top>
+              <MidmidContainer_mid_top>
+                <MidmidContainer_mid_top_left>
+                  <MidmidContainer_mid_top_left_text
+                    style={{fontWeight: 'normal', fontSize: 10}}>
+                    예약일정 :{' '}
+                  </MidmidContainer_mid_top_left_text>
+                </MidmidContainer_mid_top_left>
+                <MidmidContainer_mid_top_right>
+                  <MidmidContainer_mid_top_right_Text style={{fontSize: 10}}>
+                    {moment(item.reservation_date).format('YYYY년 MM월 DD일')}
+                    {moment(item.reservation_start_time, 'HHmm').format(
+                      'HH:mm',
+                    )}{' '}
+                    ~
+                    {moment(
+                      moment(item.reservation_start_time, 'HHmm').format(
+                        'HHmm',
+                      ) *
+                        1 +
+                        moment(
+                          item.works[0].store_work_time
+                            .replace('시간', '')
+                            .replace(' ', '')
+                            .replace('분', ''),
+                          'HHmm',
+                        ).format('HHmm') *
+                          1,
+                      'HHmm',
+                    ).format('HH:mm')}
+                    고객명 : {item.users[0].iu_name}
+                  </MidmidContainer_mid_top_right_Text>
+                </MidmidContainer_mid_top_right>
+              </MidmidContainer_mid_top>
+              <MidmidContainer_mid_top></MidmidContainer_mid_top>
+            </MidmidContainer_mid>
+          </MidmidContainer>
+        ))}
       </MidContainer>
+      {isLoading ? <Container_act></Container_act> : null}
     </Container>
   );
 }

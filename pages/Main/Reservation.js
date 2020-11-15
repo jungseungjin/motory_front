@@ -169,7 +169,7 @@ function Reservation({navigation, route}) {
     moment().format('YYYY-MM-DD'),
   );
   const [calendarArray, setCalendarArray] = React.useState({
-    '2020-11-18': {disabled: true},
+    //'2020-11-18': {disabled: true},
     //한달끝까지 객체로 해서
     //useCallback으로 수정해야될듯
     //바텀에도 리스트.맵을 써서 나오도록 수정
@@ -179,9 +179,15 @@ function Reservation({navigation, route}) {
   const [storeData, setStoreData] = React.useState([]); //매장정보 가져오기
   const [storeOneData, setStoreOneData] = React.useState([]); // 매장운영시간정보 ->selectDay의 요일에 맞춰서 변경
   //선택된날의 예약데이터 가져오기
+  const [calendarMonth, setCalendarMonth] = React.useState(
+    moment().format('YYYY-MM'),
+  );
   const get_data_date = async function (data) {
     try {
       setIsLoading(true);
+      if (data == null || data == undefined) {
+        data = moment().format('YYYY-MM-DD');
+      }
       let search_date = moment(data).format('YYYY-MM-DD');
       let url =
         Domain +
@@ -192,6 +198,7 @@ function Reservation({navigation, route}) {
         route.params.user_id +
         '&date=' +
         search_date;
+      console.log(url);
       let result = await axios.get(url);
 
       if (result.data[0].type == 0) {
@@ -240,6 +247,9 @@ function Reservation({navigation, route}) {
   const get_data_month = async function (data) {
     try {
       setIsLoading(true);
+      if (data == null || data == undefined) {
+        data = moment().format('YYYY-MM');
+      }
       let search_date = moment(data).format('YYYY-MM');
       let url =
         Domain +
@@ -250,12 +260,13 @@ function Reservation({navigation, route}) {
         route.params.user_id +
         '&date=' +
         search_date;
+      console.log(url);
       let result = await axios.get(url);
-
       if (result.data[0].type == 0) {
         setIsLoading(false);
         alert(result.data[0].message);
       } else {
+        console.log(result.data[0]);
         setCalendarArray(result.data[0]);
         setIsLoading(false);
       }
@@ -266,10 +277,13 @@ function Reservation({navigation, route}) {
     }
   };
   React.useEffect(() => {
-    get_data_date(moment()); //오늘의 예약일정
+    get_data_date(); //오늘의 예약일정
     get_data_store(); //영업시간이 언제부터 언제까지인지 알아야해서 필요 한번 호출하고 끝
-    get_data_month(moment()); //이달의 예약일정
+    get_data_month(); //이달의 예약일정
   }, []);
+  React.useEffect(() => {
+    get_data_month(calendarMonth);
+  }, [calendarMonth]);
   React.useEffect(() => {
     let day = moment(selectDay).format('ddd').toLowerCase();
     for (var a = 0; a < storeData.length; a++) {
@@ -330,6 +344,8 @@ function Reservation({navigation, route}) {
               } else {
                 data[day.dateString] = {selected: true, selectedColor: 'blue'};
               }
+
+              //다음달로 옮기고 선택했을 때 CalendarArray 의 data를바꿔줘
               setCalendarArray(data);
               setSelectDay(day.dateString);
               get_data_date(day.dateString);
@@ -348,12 +364,13 @@ function Reservation({navigation, route}) {
             // 캘린더의 달(Month)를 바꿀 때마다 실행되는 함수. 기본값은 undefined입니다.
             // month 파라미터에는 위에서 말한 캘린더 객체가 들어갑니다. (Usage 바로 밑의 캘린더 객체)
             onMonthChange={(month) => {
+              console.log(month);
               if (
                 moment(month.dateString).format('YYYY-MM-DD') <
                 moment().startOf('month').format('YYYY-MM-DD')
               ) {
               } else {
-                get_data_month(month.dateString);
+                //setCalendarMonth(month.dateString);
               }
             }}
             // 달(Month)을 바꾸는 네비게이션 화살표를 없앱니다. 기본값은 false입니다.
@@ -365,7 +382,7 @@ function Reservation({navigation, route}) {
             hideExtraDays={true}
             // 만약 hideArrows=false, hideExtraDays=false이면, 달력 페이지에 회색으로 표시된 다른 달의 날짜를 선택했을 때
             // 달이 바뀌지 않도록 합니다. 기본값은 false입니다. Default = false
-            disableMonthChange={true}
+            //disableMonthChange={true}
             // firstDay=1 이면, 월요일부터 주(week)가 시작됩니다. LocaleConfig에서  dayNames와 dayNamesShort는 일요일부터 시작해야됩니다.
             // firstDay = 1는 dayNames[1] 혹은 dayNamesShort[1]을 의미합니다.
             firstDay={0}

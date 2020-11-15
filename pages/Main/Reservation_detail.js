@@ -528,18 +528,28 @@ function Reservation_detail({navigation, route}) {
         </MidContainer_4>
       </MidContainer>
       <BottomContainer>
-        <BottomleftContainer
-          onPress={() => {
-            navigation.navigate('Chat');
-          }}>
-          <BottomleftText>쪽지</BottomleftText>
-        </BottomleftContainer>
-        <BottomrightContainer
-          onPress={() => {
-            setShowDialog(true);
-          }}>
-          <BottomrightText>고객예약 취소하기</BottomrightText>
-        </BottomrightContainer>
+        {route.params.store_info_work_type == 5 ? (
+          <>
+            <BottomrightContainer>
+              <BottomrightText>작업완료</BottomrightText>
+            </BottomrightContainer>
+          </>
+        ) : (
+          <>
+            <BottomleftContainer
+              onPress={() => {
+                navigation.navigate('Chat');
+              }}>
+              <BottomleftText>쪽지</BottomleftText>
+            </BottomleftContainer>
+            <BottomrightContainer
+              onPress={() => {
+                setShowDialog(true);
+              }}>
+              <BottomrightText>고객예약 취소하기</BottomrightText>
+            </BottomrightContainer>
+          </>
+        )}
       </BottomContainer>
       <DialogInput
         isDialogVisible={showDialog}

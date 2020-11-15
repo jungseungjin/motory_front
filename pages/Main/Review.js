@@ -158,9 +158,6 @@ const BottomrightText = styled.Text`
 `;
 
 function Review({navigation, route}) {
-  console.log('review');
-  console.log(route.params);
-  console.log('review');
   const [page, setPage] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
