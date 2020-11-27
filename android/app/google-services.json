@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "939749847532",
+    "firebase_url": "https://motory-660dd.firebaseio.com",
+    "project_id": "motory-660dd",
+    "storage_bucket": "motory-660dd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939749847532:android:160f862f3caec91fd310c9",
+        "android_client_info": {
+          "package_name": "com.motory_owner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "939749847532-tgq10pl1ctlm0ju7njaf1fs1k1ucc2cm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD11LcrSvggHzD4GlFYXZNnvVaCUS6Vles"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "939749847532-tgq10pl1ctlm0ju7njaf1fs1k1ucc2cm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -5,7 +5,7 @@ import moment from 'moment';
 import Domain from '../../net/Domain';
 import Key from '../../net/Key';
 import axios from 'axios';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, PixelRatio} from 'react-native';
 
 const Container = styled.SafeAreaView`
   flex: 1;

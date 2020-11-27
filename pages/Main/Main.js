@@ -139,6 +139,7 @@ function Main({navigation}) {
     };
     find_async();
   }, []);
+
   return (
     <Container>
       {isLoading ? (

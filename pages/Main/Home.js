@@ -188,11 +188,8 @@ function Home({navigation, route}) {
             </ToptoptopTextView>
             <ToptoptopBellView
               onPress={() => {
-                navigation.navigate('Alarm', route.params);
-              }}>
-              <ToptoptopBell
-                source={require('../../assets/image/bell.png')}></ToptoptopBell>
-            </ToptoptopBellView>
+                //navigation.navigate('Alarm', route.params);
+              }}></ToptoptopBellView>
           </ToptoptopContainer>
           <ToptopbottomContainer>
             <ToptopBottomTextView>
@@ -200,9 +197,7 @@ function Home({navigation, route}) {
             </ToptopBottomTextView>
             <ToptopBottom_rightTextView>
               {route.params.user_name ? (
-                <ToptopBottom_rightText>
-                  대표 : {route.params.user_name}
-                </ToptopBottom_rightText>
+                <ToptopBottom_rightText></ToptopBottom_rightText>
               ) : null}
             </ToptopBottom_rightTextView>
           </ToptopbottomContainer>

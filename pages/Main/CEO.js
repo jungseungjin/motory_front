@@ -1,4 +1,5 @@
 import React from 'react';
+import {Linking} from 'react-native';
 import styled from 'styled-components/native';
 
 const Container = styled.SafeAreaView`
@@ -231,7 +232,7 @@ function CEO({navigation, route}) {
             <MidBottomContainer_View_left>
               <MidBottomContainer_View_left_button
                 onPress={() => {
-                  alert('gd');
+                  Linking.openURL('tel:01027655361');
                 }}>
                 <MidBottomContainer_View_left_button_Image
                   source={require('../../assets/image/ceo_call.png')}></MidBottomContainer_View_left_button_Image>

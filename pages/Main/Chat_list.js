@@ -156,7 +156,7 @@ function Chat_list({navigation}) {
         </ToptopContainer>
       </TopContainer>
       <MidContainer>
-        <MidmidContainer>
+        <MidmidContainer onPress={()=>{navigation.navigate('Chat')}}>
           <MidmidContainer_left>
             <MidmidContainer_left_image
               source={require('../../assets/image/Group24.png')}></MidmidContainer_left_image>

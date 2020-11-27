@@ -16,6 +16,11 @@ import Reserver_list from './Reservation_list';
 import Setting from './Setting';
 import AsyncStorage from '@react-native-community/async-storage';
 import {ActivityIndicator} from 'react-native';
+
+import Domain from '../../net/Domain';
+import Key from '../../net/Key';
+import axios from 'axios';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const Container = styled.KeyboardAvoidingView`
@@ -43,9 +48,11 @@ const Container_act = styled.View`
   justify-content: center;
   align-items: center;
 `;
+import {Alert} from 'react-native';
+import messaging from '@react-native-firebase/messaging';
 function Home_navigator({route, navigation}) {
   const [user, setUser] = React.useState(false);
-  //const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
   React.useEffect(() => {
     let mounted = true;
     if (route.params.user) {
@@ -55,9 +62,23 @@ function Home_navigator({route, navigation}) {
     }
     return () => (mounted = false);
   }, []);
+
+  React.useEffect(() => {
+    try {
+      const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+        Alert.alert(
+          'A new FCM message arrived!',
+          JSON.stringify(remoteMessage),
+        );
+      });
+      return unsubscribe;
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
   return (
     <>
-      {!user ? (
+      {!user || isLoading ? (
         <Container_act>
           <ActivityIndicator color="#999999" size="large"></ActivityIndicator>
         </Container_act>
