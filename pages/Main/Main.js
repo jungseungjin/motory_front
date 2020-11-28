@@ -115,10 +115,13 @@ function Main({navigation}) {
                 'login_data',
                 JSON.stringify(async_data),
               );
+              console.log(result.data);
               let user_data = {
                 _id: result.data._id,
                 user_id: result.data.iu_id,
                 user_name: result.data.iu_name,
+                user_alarm_notice: result.data.alarm_notice,
+                user_alarm_review: result.data.alarm_review,
               };
               setUser(user_data);
               setAuto('Home_navigator');

@@ -16,6 +16,7 @@ import Reserver_list from './Reservation_list';
 import Setting from './Setting';
 import AsyncStorage from '@react-native-community/async-storage';
 import {ActivityIndicator} from 'react-native';
+import {Platform} from 'react-native';
 
 import Domain from '../../net/Domain';
 import Key from '../../net/Key';
@@ -53,6 +54,30 @@ import messaging from '@react-native-firebase/messaging';
 function Home_navigator({route, navigation}) {
   const [user, setUser] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const saveTokenToDatabase = async function (token) {
+    try {
+      let url = Domain + 'update_token';
+      let data = {
+        token: token,
+        key: Key,
+        user_id: user._id,
+      };
+      let result = await axios.post(url, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (result.data.type == 0) {
+        console.log('실패');
+      } else {
+        console.log('성공');
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err);
+    }
+  };
   React.useEffect(() => {
     let mounted = true;
     if (route.params.user) {
@@ -66,6 +91,7 @@ function Home_navigator({route, navigation}) {
   React.useEffect(() => {
     try {
       const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+        console.log(remoteMessage);
         Alert.alert(
           'A new FCM message arrived!',
           JSON.stringify(remoteMessage),
@@ -76,6 +102,28 @@ function Home_navigator({route, navigation}) {
       console.log(err);
     }
   }, []);
+  React.useEffect(() => {
+    // Get the device token
+    if (Platform.OS == 'ios') {
+      messaging()
+        .getAPNSToken()
+        .then((token) => {
+          return saveTokenToDatabase(token);
+        });
+    } else {
+      messaging()
+        .getToken()
+        .then((token) => {
+          return saveTokenToDatabase(token);
+        });
+    }
+
+    // Listen to whether the token changes
+    return messaging().onTokenRefresh((token) => {
+      saveTokenToDatabase(token);
+    });
+  }, []);
+
   return (
     <>
       {!user || isLoading ? (

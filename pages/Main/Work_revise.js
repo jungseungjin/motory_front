@@ -301,9 +301,9 @@ function Work_revise({navigation, route}) {
       setCar_list_korean_select(work_korean);
       setLabor_time(route.params.item.store_work_time);
       setNeed_day(route.params.item.store_work_need_day);
-      setTotal_cost(route.params.item.store_work_total_cost);
+      setTotal_cost(route.params.item.store_work_total_cost.toString());
       setTotal_cost_text(route.params.item.store_work_total_cost);
-      setLabor_cost(route.params.item.store_work_labor_cost);
+      setLabor_cost(route.params.item.store_work_labor_cost.toString());
       setLabor_cost_text(route.params.item.store_work_labor_cost);
       setCostOpen(route.params.item.store_work_cost_open);
       setWork_info(route.params.item.store_work_info);
@@ -794,11 +794,8 @@ function Work_revise({navigation, route}) {
                 keyboardType={'numeric'}
                 value={total_cost}
                 onChangeText={(value) => {
-                  setTotal_cost_text('');
                   setTotal_cost(value);
-                }}>
-                {total_cost_text ? total_cost_text : null}
-              </MidmidContainer_priceView_TextInput>
+                }}></MidmidContainer_priceView_TextInput>
               <MidmidContainer_priceView_Text
                 style={{
                   fontWeight: 'bold',
@@ -810,11 +807,8 @@ function Work_revise({navigation, route}) {
                 keyboardType={'numeric'}
                 value={labor_cost}
                 onChangeText={(value) => {
-                  setLabor_cost_text('');
                   setLabor_cost(value);
-                }}>
-                {labor_cost_text ? labor_cost_text : null}
-              </MidmidContainer_priceView_TextInput>
+                }}></MidmidContainer_priceView_TextInput>
             </MidmidContainer_priceView2_nested>
             <MidmidContainer_priceView2_nested_touch
               onPress={() => {

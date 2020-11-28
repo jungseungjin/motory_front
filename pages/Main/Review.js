@@ -353,56 +353,54 @@ function Review({navigation, route}) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         {data_list.map((item) => (
-          <>
-            <MidmidContainer key={item._id}>
-              <MidmidContainer_Top>
-                <MidmidContainer_Top_left>
-                  <MidmidContainer_Top_left_Image
-                    source={{
-                      uri: item.store_thumbnail[0],
-                    }}></MidmidContainer_Top_left_Image>
-                </MidmidContainer_Top_left>
-                <MidmidContainer_Top_right>
-                  <MidmidContainer_Top_right_Text_View>
-                    <MidmidContainer_Top_right_Text>
-                      {item.store_work_name}
-                    </MidmidContainer_Top_right_Text>
-                  </MidmidContainer_Top_right_Text_View>
-                  <MidmidContainer_Top_right_Text2_View>
-                    <MidmidContainer_Top_right_Text2 style={{fontSize: 24}}>
-                      ⭐️ {item.store_work_grade}
-                    </MidmidContainer_Top_right_Text2>
-                    <MidmidContainer_Top_right_Text2>
-                      고객후기 {item.reviews.length ? item.reviews.length : 0}개
-                    </MidmidContainer_Top_right_Text2>
-                    <MidmidContainer_Top_right_Text2>
-                      사장님답글 {item.owner_reply_count}개
-                    </MidmidContainer_Top_right_Text2>
-                  </MidmidContainer_Top_right_Text2_View>
-                </MidmidContainer_Top_right>
-              </MidmidContainer_Top>
-              <MidmidContainer_Bottom>
-                <MidmidContainer_Bottom_left></MidmidContainer_Bottom_left>
-                <MidmidContainer_Bottom_right>
-                  <MidmidContainer_Bottom_right_Button
-                    onPress={() => {
-                      navigation.navigate('Review_detail', {item});
-                    }}
-                    style={{
-                      borderBottomColor: '#946AEF',
-                      borderTopColor: '#946AEF',
-                      borderRightColor: '#946AEF',
-                      borderLeftColor: '#946AEF',
-                    }}>
-                    <MidmidContainer_Bottom_right_Button_Text
-                      style={{color: '#946AEF'}}>
-                      답글남기러가기
-                    </MidmidContainer_Bottom_right_Button_Text>
-                  </MidmidContainer_Bottom_right_Button>
-                </MidmidContainer_Bottom_right>
-              </MidmidContainer_Bottom>
-            </MidmidContainer>
-          </>
+          <MidmidContainer key={item._id}>
+            <MidmidContainer_Top>
+              <MidmidContainer_Top_left>
+                <MidmidContainer_Top_left_Image
+                  source={{
+                    uri: item.store_thumbnail[0],
+                  }}></MidmidContainer_Top_left_Image>
+              </MidmidContainer_Top_left>
+              <MidmidContainer_Top_right>
+                <MidmidContainer_Top_right_Text_View>
+                  <MidmidContainer_Top_right_Text>
+                    {item.store_work_name}
+                  </MidmidContainer_Top_right_Text>
+                </MidmidContainer_Top_right_Text_View>
+                <MidmidContainer_Top_right_Text2_View>
+                  <MidmidContainer_Top_right_Text2 style={{fontSize: 24}}>
+                    ⭐️ {item.store_work_grade}
+                  </MidmidContainer_Top_right_Text2>
+                  <MidmidContainer_Top_right_Text2>
+                    고객후기 {item.reviews.length ? item.reviews.length : 0}개
+                  </MidmidContainer_Top_right_Text2>
+                  <MidmidContainer_Top_right_Text2>
+                    사장님답글 {item.owner_reply_count}개
+                  </MidmidContainer_Top_right_Text2>
+                </MidmidContainer_Top_right_Text2_View>
+              </MidmidContainer_Top_right>
+            </MidmidContainer_Top>
+            <MidmidContainer_Bottom>
+              <MidmidContainer_Bottom_left></MidmidContainer_Bottom_left>
+              <MidmidContainer_Bottom_right>
+                <MidmidContainer_Bottom_right_Button
+                  onPress={() => {
+                    navigation.navigate('Review_detail', {item});
+                  }}
+                  style={{
+                    borderBottomColor: '#946AEF',
+                    borderTopColor: '#946AEF',
+                    borderRightColor: '#946AEF',
+                    borderLeftColor: '#946AEF',
+                  }}>
+                  <MidmidContainer_Bottom_right_Button_Text
+                    style={{color: '#946AEF'}}>
+                    답글남기러가기
+                  </MidmidContainer_Bottom_right_Button_Text>
+                </MidmidContainer_Bottom_right_Button>
+              </MidmidContainer_Bottom_right>
+            </MidmidContainer_Bottom>
+          </MidmidContainer>
         ))}
       </MidContainer>
       <BottomContainer>

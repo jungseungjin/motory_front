@@ -64,7 +64,7 @@ const TopbottomleftText = styled.Text`
 const MidContainer = styled.ScrollView`
   flex: 8;
   border-top-color: #ff00ff;
-  border-top-width: 1;
+  border-top-width: 1px;
   background-color: #f5f5f5;
 `;
 const MidmidContainer = styled.TouchableOpacity`

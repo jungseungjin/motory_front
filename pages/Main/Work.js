@@ -462,109 +462,106 @@ function Work({navigation, route}) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         {data_list.map((item) => (
-          <>
-            <MidmidContainer key={item._id}>
-              <MidmidContainer_Top>
-                <MidmidContainer_Top_left>
-                  <MidmidContainer_Top_left_Image
-                    source={{
-                      uri: item.store_thumbnail[0],
-                    }}></MidmidContainer_Top_left_Image>
-                </MidmidContainer_Top_left>
-                <MidmidContainer_Top_right>
-                  <MidmidContainer_Top_right_Text_View>
-                    <MidmidContainer_Top_right_Text>
-                      {item.store_work_name}
-                    </MidmidContainer_Top_right_Text>
-                  </MidmidContainer_Top_right_Text_View>
-                  <MidmidContainer_Top_right_Text2_View>
-                    <MidmidContainer_Top_right_Text2>
-                      차종 :{' '}
-                      {item.store_info_car[0] == 'all'
-                        ? '전체'
-                        : item.cars.length == 1
-                        ? item.cars[0].model
-                        : item.cars.length > 1
-                        ? item.cars[0].model +
-                          '외 ' +
-                          (item.cars.length - 1) +
-                          '종'
-                        : null}
-                    </MidmidContainer_Top_right_Text2>
-                    <MidmidContainer_Top_right_Text2>
-                      작업소요시간 : {item.store_work_time}
-                    </MidmidContainer_Top_right_Text2>
-                    <MidmidContainer_Top_right_Text2>
-                      공임비 : {item.store_work_labor_cost}원
-                    </MidmidContainer_Top_right_Text2>
-                    <MidmidContainer_Top_right_Text2>
-                      부품비 :{' '}
-                      {item.store_work_total_cost - item.store_work_labor_cost}
-                      원
-                    </MidmidContainer_Top_right_Text2>
-                  </MidmidContainer_Top_right_Text2_View>
-                </MidmidContainer_Top_right>
-              </MidmidContainer_Top>
-              <MidmidContainer_Bottom>
-                <MidmidContainer_Bottom_left></MidmidContainer_Bottom_left>
-                <MidmidContainer_Bottom_right>
-                  <MidmidContainer_Bottom_right_Button
-                    onPress={() => {
-                      navigation.navigate('Work_revise', {
-                        route,
-                        item,
-                        onRefresh,
-                      });
-                    }}
-                    style={{
-                      borderBottomColor: '#0066B1',
-                      borderTopColor: '#0066B1',
-                      borderRightColor: '#0066B1',
-                      borderLeftColor: '#0066B1',
-                    }}>
-                    <MidmidContainer_Bottom_right_Button_Text
-                      style={{color: '#0066B1'}}>
-                      수정
-                    </MidmidContainer_Bottom_right_Button_Text>
-                  </MidmidContainer_Bottom_right_Button>
-                  <MidmidContainer_Bottom_right_Button
-                    onPress={() => {
-                      if (item.store_work_stop == false) {
-                        data_pause(item);
-                      } else {
-                        data_open(item);
-                      }
-                    }}
-                    style={{
-                      borderBottomColor: '#003D78',
-                      borderTopColor: '#003D78',
-                      borderRightColor: '#003D78',
-                      borderLeftColor: '#003D78',
-                    }}>
-                    <MidmidContainer_Bottom_right_Button_Text
-                      style={{color: '#003D78'}}>
-                      {item.store_work_stop == false ? '일시중지' : '다시시작'}
-                    </MidmidContainer_Bottom_right_Button_Text>
-                  </MidmidContainer_Bottom_right_Button>
-                  <MidmidContainer_Bottom_right_Button
-                    onPress={() => {
-                      data_delete(item);
-                    }}
-                    style={{
-                      borderBottomColor: '#FF0000',
-                      borderTopColor: '#FF0000',
-                      borderRightColor: '#FF0000',
-                      borderLeftColor: '#FF0000',
-                    }}>
-                    <MidmidContainer_Bottom_right_Button_Text
-                      style={{color: '#FF0000'}}>
-                      삭제
-                    </MidmidContainer_Bottom_right_Button_Text>
-                  </MidmidContainer_Bottom_right_Button>
-                </MidmidContainer_Bottom_right>
-              </MidmidContainer_Bottom>
-            </MidmidContainer>
-          </>
+          <MidmidContainer key={item._id}>
+            <MidmidContainer_Top>
+              <MidmidContainer_Top_left>
+                <MidmidContainer_Top_left_Image
+                  source={{
+                    uri: item.store_thumbnail[0],
+                  }}></MidmidContainer_Top_left_Image>
+              </MidmidContainer_Top_left>
+              <MidmidContainer_Top_right>
+                <MidmidContainer_Top_right_Text_View>
+                  <MidmidContainer_Top_right_Text>
+                    {item.store_work_name}
+                  </MidmidContainer_Top_right_Text>
+                </MidmidContainer_Top_right_Text_View>
+                <MidmidContainer_Top_right_Text2_View>
+                  <MidmidContainer_Top_right_Text2>
+                    차종 :{' '}
+                    {item.store_info_car[0] == 'all'
+                      ? '전체'
+                      : item.cars.length == 1
+                      ? item.cars[0].model
+                      : item.cars.length > 1
+                      ? item.cars[0].model +
+                        '외 ' +
+                        (item.cars.length - 1) +
+                        '종'
+                      : null}
+                  </MidmidContainer_Top_right_Text2>
+                  <MidmidContainer_Top_right_Text2>
+                    작업소요시간 : {item.store_work_time}
+                  </MidmidContainer_Top_right_Text2>
+                  <MidmidContainer_Top_right_Text2>
+                    공임비 : {item.store_work_labor_cost}원
+                  </MidmidContainer_Top_right_Text2>
+                  <MidmidContainer_Top_right_Text2>
+                    부품비 :{' '}
+                    {item.store_work_total_cost - item.store_work_labor_cost}원
+                  </MidmidContainer_Top_right_Text2>
+                </MidmidContainer_Top_right_Text2_View>
+              </MidmidContainer_Top_right>
+            </MidmidContainer_Top>
+            <MidmidContainer_Bottom>
+              <MidmidContainer_Bottom_left></MidmidContainer_Bottom_left>
+              <MidmidContainer_Bottom_right>
+                <MidmidContainer_Bottom_right_Button
+                  onPress={() => {
+                    navigation.navigate('Work_revise', {
+                      route,
+                      item,
+                      onRefresh,
+                    });
+                  }}
+                  style={{
+                    borderBottomColor: '#0066B1',
+                    borderTopColor: '#0066B1',
+                    borderRightColor: '#0066B1',
+                    borderLeftColor: '#0066B1',
+                  }}>
+                  <MidmidContainer_Bottom_right_Button_Text
+                    style={{color: '#0066B1'}}>
+                    수정
+                  </MidmidContainer_Bottom_right_Button_Text>
+                </MidmidContainer_Bottom_right_Button>
+                <MidmidContainer_Bottom_right_Button
+                  onPress={() => {
+                    if (item.store_work_stop == false) {
+                      data_pause(item);
+                    } else {
+                      data_open(item);
+                    }
+                  }}
+                  style={{
+                    borderBottomColor: '#003D78',
+                    borderTopColor: '#003D78',
+                    borderRightColor: '#003D78',
+                    borderLeftColor: '#003D78',
+                  }}>
+                  <MidmidContainer_Bottom_right_Button_Text
+                    style={{color: '#003D78'}}>
+                    {item.store_work_stop == false ? '일시중지' : '다시시작'}
+                  </MidmidContainer_Bottom_right_Button_Text>
+                </MidmidContainer_Bottom_right_Button>
+                <MidmidContainer_Bottom_right_Button
+                  onPress={() => {
+                    data_delete(item);
+                  }}
+                  style={{
+                    borderBottomColor: '#FF0000',
+                    borderTopColor: '#FF0000',
+                    borderRightColor: '#FF0000',
+                    borderLeftColor: '#FF0000',
+                  }}>
+                  <MidmidContainer_Bottom_right_Button_Text
+                    style={{color: '#FF0000'}}>
+                    삭제
+                  </MidmidContainer_Bottom_right_Button_Text>
+                </MidmidContainer_Bottom_right_Button>
+              </MidmidContainer_Bottom_right>
+            </MidmidContainer_Bottom>
+          </MidmidContainer>
         ))}
       </MidContainer>
       <BottomContainer>

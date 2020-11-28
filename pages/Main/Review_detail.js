@@ -104,7 +104,7 @@ const MidContainer = styled.ScrollView`
   flex: 8;
   margin-top: 20px;
   border-top-color: #eeeeee;
-  border-top-width: 2;
+  border-top-width: 2px;
 `;
 const MidmidContainer = styled.View`
   height: 500px;

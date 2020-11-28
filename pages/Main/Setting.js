@@ -2,6 +2,9 @@ import React from 'react';
 import styled from 'styled-components/native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Container_act from '../../components/Main/Container_act';
+import Domain from '../../net/Domain';
+import Key from '../../net/Key';
+import axios from 'axios';
 import {onChange} from 'react-native-reanimated';
 
 const Container = styled.SafeAreaView`
@@ -88,66 +91,29 @@ const MidContainer_Mid_Right = styled.TouchableOpacity`
 const MidContainer_Mid_Right_Image = styled.Image``;
 function setting({navigation, route}) {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [review, setReview] = React.useState(true);
-  const [notice, setNotice] = React.useState(true);
-  React.useEffect(() => {
-    let get_data = async function () {
-      try {
-        setIsLoading(true);
-        let setting = await AsyncStorage.getItem('setting');
-        if (setting === null) {
-          setting = {
-            review: true,
-            notice: true,
-          };
-          await AsyncStorage.setItem('setting', JSON.stringify(setting));
-        } else {
-          setting = await JSON.parse(setting);
-          if (setting.review == true) {
-            setReview(true);
-          } else {
-            setReview(false);
-          }
-          if (setting.notice == true) {
-            setNotice(true);
-          } else {
-            setNotice(false);
-          }
-        }
-        setIsLoading(false);
-      } catch (err) {
-        setIsLoading(false);
-        console.log(err);
-        alert(err);
-      }
-    };
-    get_data();
-  }, []);
-  const asyncOnChange = async function (type, data) {
+  console.log(route.params);
+  const asyncOnChange = async function (type, num) {
     try {
       setIsLoading(true);
-      let setting = await AsyncStorage.getItem('setting');
-      if (setting === null) {
-        if (type == 'review') {
-          setting = {
-            review: data,
-          };
-        } else if (type == 'notice') {
-          setting = {
-            notice: data,
-          };
-        }
-        await AsyncStorage.setItem('setting', JSON.stringify(setting));
+      let url = Domain + 'user_alarm';
+      let data = {
+        type: type,
+        key: Key,
+        user_id: route.params._id,
+        num: num,
+      };
+      let result = await axios.post(url, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (result.data.type == 1) {
+        console.log('ok');
+        setIsLoading(false);
       } else {
-        setting = await JSON.parse(setting);
-        if (type == 'review') {
-          setting.review = data;
-        } else if (type == 'notice') {
-          setting.notice = data;
-        }
-        await AsyncStorage.setItem('setting', JSON.stringify(setting));
+        setIsLoading(false);
+        alert(result.data.message);
       }
-      setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
       console.log(err);
@@ -178,12 +144,12 @@ function setting({navigation, route}) {
           </MidContainer_Mid_Left>
           <MidContainer_Mid_Right
             onPress={() => {
-              asyncOnChange('review', !review);
-              setReview(!review);
+              asyncOnChange('review', !route.params.user_alarm_review);
+              route.params.user_alarm_review = !route.params.user_alarm_review;
             }}>
             <MidContainer_Mid_Right_Image
               source={
-                review
+                route.params.user_alarm_review
                   ? require('../../assets/image/setting_chk.png')
                   : require('../../assets/image/setting_nochk.png')
               }></MidContainer_Mid_Right_Image>
@@ -197,15 +163,23 @@ function setting({navigation, route}) {
           </MidContainer_Mid_Left>
           <MidContainer_Mid_Right
             onPress={() => {
-              asyncOnChange('notice', !notice);
-              setNotice(!notice);
+              asyncOnChange('notice', !route.params.user_alarm_notice);
+              route.params.user_alarm_notice = !route.params.user_alarm_notice;
             }}>
             <MidContainer_Mid_Right_Image
               source={
-                notice
+                route.params.user_alarm_notice
                   ? require('../../assets/image/setting_chk.png')
                   : require('../../assets/image/setting_nochk.png')
               }></MidContainer_Mid_Right_Image>
+          </MidContainer_Mid_Right>
+        </MidContainer_Mid>
+        <MidContainer_Mid>
+          <MidContainer_Mid_Left>
+            <MidContainer_Mid_Left_Text>현재 버전</MidContainer_Mid_Left_Text>
+          </MidContainer_Mid_Left>
+          <MidContainer_Mid_Right onPress={() => {}}>
+            <MidContainer_Mid_Left_Text>1.0.0</MidContainer_Mid_Left_Text>
           </MidContainer_Mid_Right>
         </MidContainer_Mid>
       </MidContainer>
