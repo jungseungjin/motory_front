@@ -538,9 +538,10 @@ function Reservation_detail({navigation, route}) {
           <>
             <BottomleftContainer
               onPress={() => {
-                navigation.navigate('Chat');
+                alert('준비중입니다.');
+                //navigation.navigate('Chat');
               }}>
-              <BottomleftText>쪽지</BottomleftText>
+              <BottomleftText>채팅</BottomleftText>
             </BottomleftContainer>
             <BottomrightContainer
               onPress={() => {

@@ -91,7 +91,7 @@ const BottomBottomContainer_nest = styled.View`
   flex-direction: row;
 `;
 const BottomBottomContainer_nest_left = styled.View`
-  flex: 1;
+  flex: 1.2;
   flex-direction: row;
 `;
 const BottomBottomContainer_nest_left_text = styled.Text`
@@ -182,6 +182,7 @@ function Reservation({navigation, route}) {
   const [calendarMonth, setCalendarMonth] = React.useState(
     moment().format('YYYY-MM'),
   );
+  const [workTime, setWorkTime] = React.useState([]);
   const get_data_date = async function (data) {
     try {
       setIsLoading(true);
@@ -198,7 +199,6 @@ function Reservation({navigation, route}) {
         route.params.user_id +
         '&date=' +
         search_date;
-      console.log(url);
       let result = await axios.get(url);
 
       if (result.data[0].type == 0) {
@@ -234,7 +234,6 @@ function Reservation({navigation, route}) {
       } else {
         setStoreData(result.data);
         setIsLoading(false);
-        //console.log(result.data);
       }
     } catch (err) {
       setIsLoading(false);
@@ -285,13 +284,69 @@ function Reservation({navigation, route}) {
     get_data_month(calendarMonth);
   }, [calendarMonth]);
   React.useEffect(() => {
-    let day = moment(selectDay).format('ddd').toLowerCase();
-    for (var a = 0; a < storeData.length; a++) {
-      if (day == storeData[a][0]) {
-        let new_data = storeData[a];
-        new_data.splice(0, 1);
-        setStoreOneData(new_data);
+    try {
+      let day = moment(selectDay).format('ddd').toLowerCase();
+      let storeOneData_chk;
+      for (var a = 0; a < storeData.length; a++) {
+        if (day == storeData[a][0]) {
+          let new_data = storeData[a];
+          new_data.splice(0, 1);
+          storeOneData_chk = new_data;
+          setStoreOneData(new_data);
+        }
       }
+      //StoreOneData -> 영업시간 나열 0900 0930 ---
+      //dayData -> 그날의 예약데이터 없을수도있음
+      if (dayData.length == 0) {
+        setWorkTime([]);
+      } else if (dayData[0]._id == 'null') {
+        //예약데이터 없음
+        setWorkTime([]);
+      } else {
+        //예약데이터 있음
+        setWorkTime([]);
+        if (storeOneData_chk == undefined) {
+          storeOneData_chk = storeOneData;
+        }
+        for (var b = 0; b < storeOneData_chk.length; b++) {
+          let new_array = dayData.find(function (element) {
+            if (element.reservation_start_time == storeOneData_chk[b]) {
+              return true;
+            }
+            if (element.works) {
+              if (
+                element.reservation_start_time < storeOneData_chk[b] &&
+                moment(element.reservation_start_time, 'HHmm').format('HHmm') *
+                  1 +
+                  moment(
+                    element.works[0].store_work_time
+                      .replace('시간', '')
+                      .replace(' ', '')
+                      .replace('분', ''),
+                    'HHmm',
+                  ).format('HHmm') *
+                    1 >
+                  storeOneData_chk[b] * 1
+              ) {
+                return true;
+              }
+            }
+          });
+          if (new_array == undefined) {
+            //작업 비어있는 시간
+          } else {
+            //작업 채워져있는 시간
+            if (workTime.indexOf(storeOneData_chk[b]) != -1) {
+              //있으면
+            } else {
+              workTime.push(storeOneData_chk[b]);
+            }
+            setWorkTime(workTime);
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err);
     }
   }, [dayData]);
   return (
@@ -364,7 +419,6 @@ function Reservation({navigation, route}) {
             // 캘린더의 달(Month)를 바꿀 때마다 실행되는 함수. 기본값은 undefined입니다.
             // month 파라미터에는 위에서 말한 캘린더 객체가 들어갑니다. (Usage 바로 밑의 캘린더 객체)
             onMonthChange={(month) => {
-              console.log(month);
               if (
                 moment(month.dateString).format('YYYY-MM-DD') <
                 moment().startOf('month').format('YYYY-MM-DD')
@@ -379,7 +433,7 @@ function Reservation({navigation, route}) {
             // direction 파라미터에는 'left' 혹은 'right'이 들어갑니다.
             //renderArrow={(direction) => <Arrow />}
             // 다른 달의 요일을 월 페이지에 표시하지 않습니다. 기본값은 false입니다.
-            hideExtraDays={true}
+            //hideExtraDays={true}
             // 만약 hideArrows=false, hideExtraDays=false이면, 달력 페이지에 회색으로 표시된 다른 달의 날짜를 선택했을 때
             // 달이 바뀌지 않도록 합니다. 기본값은 false입니다. Default = false
             //disableMonthChange={true}
@@ -413,63 +467,72 @@ function Reservation({navigation, route}) {
           <BottomTopContainer_Text>예약세부일정</BottomTopContainer_Text>
         </BottomTopContainer>
         <BottomBottomContainer>
-          {storeOneData.map((item) => (
-            <BottomBottomContainer_nest key={item}>
-              <BottomBottomContainer_nest_left>
-                <BottomBottomContainer_nest_left_text style={{marginTop: 10}}>
-                  {moment(item, 'HHmm').format('HH:mm A')}
-                </BottomBottomContainer_nest_left_text>
-              </BottomBottomContainer_nest_left>
-              {
-                (new_array = dayData.find(function (element) {
-                  if (element.reservation_start_time == item) {
-                    return true;
-                  }
-                }))
-              }
-              {dayData.map((item2) =>
-                item2.reservation_start_time == item ? (
-                  <BottomBottomContainer_nest_right
-                    key={item2.reservation_start_time}>
-                    <BottomBottomContainer_nest_right_image
-                      source={require('../../assets/image/gray_bar.png')}></BottomBottomContainer_nest_right_image>
-                    <BottomBottomContainer_nest_right_left>
-                      <BottomBottomContainer_nest_right_left_text>
-                        {item2.users[0].iu_name} 고객
-                      </BottomBottomContainer_nest_right_left_text>
-                      <BottomBottomContainer_nest_right_left_text2>
-                        {item2.reservation_contents}
-                      </BottomBottomContainer_nest_right_left_text2>
-                    </BottomBottomContainer_nest_right_left>
-                    <BottomBottomContainer_nest_right_right
-                      onPress={() => {
-                        navigation.navigate('Reservation_detail', item2);
-                      }}>
-                      <BottomBottomContainer_nest_right_right_image
-                        source={require('../../assets/image/yellow_plus.png')}></BottomBottomContainer_nest_right_right_image>
-                    </BottomBottomContainer_nest_right_right>
-                  </BottomBottomContainer_nest_right>
-                ) : item2.reservation_start_time < item &&
-                  moment(item2.reservation_start_time, 'HHmm').format('HHmm') *
-                    1 +
-                    moment(
-                      item2.works[0].store_work_time
-                        .replace('시간', '')
-                        .replace(' ', '')
-                        .replace('분', ''),
+          {storeOneData.map((item) =>
+            workTime.indexOf(item) != -1 ? (
+              <BottomBottomContainer_nest key={item}>
+                <BottomBottomContainer_nest_left>
+                  <BottomBottomContainer_nest_left_text style={{marginTop: 10}}>
+                    {moment(item, 'HHmm').format('HH:mm A')}
+                  </BottomBottomContainer_nest_left_text>
+                </BottomBottomContainer_nest_left>
+                {dayData.map((item2) =>
+                  item2.reservation_start_time == item ? (
+                    <BottomBottomContainer_nest_right
+                      key={item2.reservation_start_time}>
+                      <BottomBottomContainer_nest_right_image
+                        source={require('../../assets/image/gray_bar.png')}></BottomBottomContainer_nest_right_image>
+                      <BottomBottomContainer_nest_right_left>
+                        <BottomBottomContainer_nest_right_left_text>
+                          {item2.users[0].iu_name} 고객
+                        </BottomBottomContainer_nest_right_left_text>
+                        <BottomBottomContainer_nest_right_left_text2>
+                          {item2.reservation_contents}
+                        </BottomBottomContainer_nest_right_left_text2>
+                      </BottomBottomContainer_nest_right_left>
+                      <BottomBottomContainer_nest_right_right
+                        onPress={() => {
+                          navigation.navigate('Reservation_detail', item2);
+                        }}>
+                        <BottomBottomContainer_nest_right_right_image
+                          source={require('../../assets/image/yellow_plus.png')}></BottomBottomContainer_nest_right_right_image>
+                      </BottomBottomContainer_nest_right_right>
+                    </BottomBottomContainer_nest_right>
+                  ) : item2.reservation_start_time < item &&
+                    moment(item2.reservation_start_time, 'HHmm').format(
                       'HHmm',
-                    ).format('HHmm') *
-                      1 >
-                    item ? (
-                  <BottomBottomContainer_nest_right
-                    key={item2.reservation_start_time}>
-                    <BottomBottomContainer_nest_right_image
-                      source={require('../../assets/image/gray_bar.png')}></BottomBottomContainer_nest_right_image>
-                  </BottomBottomContainer_nest_right>
-                ) : null,
-              )}
-            </BottomBottomContainer_nest>
-          ))}
+                    ) *
+                      1 +
+                      moment(
+                        item2.works[0].store_work_time
+                          .replace('시간', '')
+                          .replace(' ', '')
+                          .replace('분', ''),
+                        'HHmm',
+                      ).format('HHmm') *
+                        1 >
+                      item ? (
+                    <BottomBottomContainer_nest_right
+                      key={item2.reservation_start_time}>
+                      <BottomBottomContainer_nest_right_image
+                        source={require('../../assets/image/gray_bar.png')}></BottomBottomContainer_nest_right_image>
+                    </BottomBottomContainer_nest_right>
+                  ) : null,
+                )}
+              </BottomBottomContainer_nest>
+            ) : (
+              <BottomBottomContainer_nest key={item}>
+                <BottomBottomContainer_nest_left>
+                  <BottomBottomContainer_nest_left_text style={{marginTop: 10}}>
+                    {moment(item, 'HHmm').format('HH:mm A')}
+                  </BottomBottomContainer_nest_left_text>
+                </BottomBottomContainer_nest_left>
+                <BottomBottomContainer_nest_right>
+                  <BottomBottomContainer_nest_right_image
+                    source={require('../../assets/image/green_bar.png')}></BottomBottomContainer_nest_right_image>
+                </BottomBottomContainer_nest_right>
+              </BottomBottomContainer_nest>
+            ),
+          )}
         </BottomBottomContainer>
       </BottomContainer>
       {isLoading ? <Container_act></Container_act> : null}
