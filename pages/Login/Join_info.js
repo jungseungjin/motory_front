@@ -13,7 +13,6 @@ import GoBackImage from '../../components/Login/GoBackImage';
 import GoBack from '../../components/Login/GoBack';
 import Auth from '../../components/Login/Auth';
 import AuthText from '../../components/Login/AuthText';
-import PhoneView from '../../components/Login/PhoneView';
 import Join from './Join';
 import Join_ok from './Join_ok';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -22,6 +21,8 @@ import axios from 'axios';
 import Domain from '../../net/Domain';
 import Key from '../../net/Key';
 import {ActivityIndicator} from 'react-native';
+import auth from '@react-native-firebase/auth';
+import moment from 'moment';
 /*
 안된것
 1. 휴대폰인증
@@ -40,7 +41,7 @@ const Input = styled.TextInput`
   border: 1px solid #aaaaaa;
   padding: 3.5%;
   background-color: #ffffff;
-  margin-top: 5%;
+  margin-top: 3%;
   height: 50px;
   border-radius: 5px;
 `;
@@ -57,7 +58,7 @@ const InputSub = styled.TextInput`
   background-color: #ffffff;
   margin-top: 5%;
   height: 50px;
-  border-radius: 5;
+  border-radius: 5px;
 `;
 const PicketView = styled.View`
   flex: 1;
@@ -88,6 +89,16 @@ const Container_act = styled.View`
   justify-content: center;
   align-items: center;
 `;
+const PhoneView2 = styled.View`
+  flex-direction: row;
+`;
+const PhoneView2_view = styled.View`
+  flex-direction: row;
+  border: 1px solid #aaaaaa;
+`;
+
+const PhoneView2_input = styled.TextInput``;
+const PhoneView2_text = styled.Text``;
 function Join_info(props) {
   const aa = props.route.params.Agree_1;
   const bb = props.route.params.Agree_2;
@@ -106,18 +117,53 @@ function Join_info(props) {
   const [mailPicker, setMailPicker] = React.useState(''); //메일 선택 값
   const [nameInput, setNameInput] = React.useState(''); //이름
   const [phoneInput, setPhoneInput] = React.useState(''); //휴대폰번호
-  const [phoneSend, setPhoneSendInput] = React.useState(''); //휴대폰번호인증버튼 눌렀는지
+  const [phoneSend, setPhoneSendInput] = React.useState(0); //휴대폰번호인증버튼 눌렀는지
   const [phoneCheckInput, setPhoneCheckInput] = React.useState(''); //휴대폰 인증값
   const [phoneCheckAuth, setPhoneCheckAuth] = React.useState(true); //휴대폰인증버튼을 눌러서 인증받았는지
+  const [confirm, setConfirm] = React.useState(null);
+  const [code, setCode] = React.useState(''); //휴대폰 인증값
+  const [codeTime, setCodeTime] = React.useState(''); //인증번호 시간
+
+  React.useEffect(() => {
+    if (codeTime && codeTime != '00:00') {
+      setTimeout(() => {
+        setCodeTime(
+          moment(codeTime, 'mm:ss').add(-1, 'seconds').format('mm:ss'),
+        );
+      }, 1000);
+    }
+  }, [codeTime]);
+  async function signInWithPhoneNumber(phoneNumber) {
+    try {
+      console.log(phoneNumber);
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      setConfirm(confirmation);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function confirmCode() {
+    try {
+      let result = await confirm.confirm(code);
+      setPhoneCheckAuth(true);
+      alert('완료');
+    } catch (error) {
+      setPhoneCheckAuth(false);
+      alert('인증번호를 확인해주세요.');
+      console.log(error);
+    }
+  }
   const chk_id = async function (value) {
     var pattern3 = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
     if (pattern3.test(value)) {
       setIdCheck('특수문자를 사용할 수 없습니다.');
     } else {
       if (value.length > 3) {
-        let url = Domain + 'chk_id?user_id=' + value + '&' + Key;
+        let url = Domain + 'chk_id?user_id=' + value + '&key=' + Key;
         console.log(url);
         let result = await axios.post(url);
+        console.log(result);
         if (result.data.type == 1) {
           setIdCheck(1);
         } else {
@@ -168,7 +214,7 @@ function Join_info(props) {
       dd +
       '&agree5=' +
       ee +
-      '&' +
+      '&key=' +
       Key;
     console.log(url);
     let result = await axios.post(url);
@@ -254,7 +300,7 @@ function Join_info(props) {
           {mailPicker === 'self' ? (
             <PicketView
               style={{
-                backgrounColor: '#ffffff',
+                backgroundColor: '#ffffff',
                 border: '1px solid #aaaaaa',
                 width: '90%',
                 justifyContent: 'center',
@@ -327,7 +373,10 @@ function Join_info(props) {
           onChangeText={(value) => {
             setNameInput(value);
           }}></Input>
-        <PhoneView style={{zIndex: -5000}}>
+        <PhoneView2
+          style={{
+            zIndex: -5000,
+          }}>
           <Input
             dataDetectorTypes={'phoneNumber'}
             keyboardType={'number-pad'}
@@ -339,23 +388,90 @@ function Join_info(props) {
             }}></Input>
           {phoneInput.length === 11 ? (
             <Auth
-              style={{color: '#7E88E4', borderColor: '#7E88E4'}}
+              style={{
+                color: '#7E88E4',
+                borderColor: '#7E88E4',
+                marginTop: '3%',
+              }}
               onPress={() => {
-                alert('인증번호 전송');
-                setPhoneSendInput(true);
+                let new_num = phoneInput;
+                new_num = new_num.replace(0, '');
+                signInWithPhoneNumber('+82' + new_num);
+                setPhoneSendInput(1);
                 Keyboard.dismiss();
+                setCodeTime(moment('0300', 'mmss').format('mm:ss'));
+                alert('인증번호 전송');
               }}>
               <AuthText style={{color: '#7E88E4'}}>인증</AuthText>
             </Auth>
           ) : (
             <Auth
+              style={{marginTop: '3%'}}
               onPress={() => {
                 alert('휴대폰번호를 모두 입력해주세요.');
               }}>
               <AuthText>인증</AuthText>
             </Auth>
           )}
-        </PhoneView>
+        </PhoneView2>
+        {phoneSend ? (
+          <>
+            <PhoneView2 style={{zIndex: -5000, border: '1px solid #aaaaaa'}}>
+              <PhoneView2_view
+                style={{
+                  marginTop: '3%',
+                  zIndex: -5000,
+                  width: '65%',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #aaaaaa',
+                  borderRadius: 5,
+                }}>
+                <PhoneView2_input
+                  style={{
+                    marginLeft: '2%',
+                    width: '80%',
+                  }}
+                  dataDetectorTypes={'phoneNumber'}
+                  keyboardType={'number-pad'}
+                  placeholder={'인증번호'}
+                  value={code}
+                  onChangeText={(value) => {
+                    setCode(value);
+                  }}></PhoneView2_input>
+                <PhoneView2_text
+                  style={{
+                    marginTop: 'auto',
+                    marginBottom: 'auto',
+                    color: 'red',
+                  }}>
+                  {codeTime}
+                </PhoneView2_text>
+              </PhoneView2_view>
+              <Auth
+                style={{
+                  color: 'black',
+                  border: '1px solid #aaaaaa',
+                  marginTop: '3%',
+                }}
+                onPress={() => {
+                  if (codeTime != '00:00') {
+                    confirmCode();
+                    Keyboard.dismiss();
+                  } else {
+                    alert('시간초과');
+                  }
+                }}>
+                {code.length === 6 ? (
+                  <AuthText style={{color: 'black'}}>완료</AuthText>
+                ) : (
+                  <AuthText style={{color: '#aaaaaa'}}>완료</AuthText>
+                )}
+              </Auth>
+            </PhoneView2>
+          </>
+        ) : (
+          <PhoneView2 style={{zIndex: -5000}}></PhoneView2>
+        )}
       </KeyboardAvoidingView>
       <FooterContainer>
         <FooterView

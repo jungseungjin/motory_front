@@ -9,11 +9,13 @@ import Home from './Home';
 import Work from './Work';
 import Review from './Review';
 import Reservation from './Reservation';
+import Test from './Test';
 import Ceo from './CEO';
 import Work_register from './Work_register';
 import Chat_list from './Chat_list';
 import Reserver_list from './Reservation_list';
 import Setting from './Setting';
+
 import AsyncStorage from '@react-native-community/async-storage';
 import {ActivityIndicator} from 'react-native';
 import {Platform} from 'react-native';
@@ -62,6 +64,7 @@ function Home_navigator({route, navigation}) {
         key: Key,
         user_id: user._id,
       };
+      console.log(data);
       let result = await axios.post(url, data, {
         headers: {
           'Content-Type': 'application/json',
@@ -82,8 +85,46 @@ function Home_navigator({route, navigation}) {
     let mounted = true;
     if (route.params.user) {
       setUser(route.params.user);
+      if (Platform.OS == 'ios') {
+        messaging()
+          .getAPNSToken()
+          .then((token) => {
+            console.log(token);
+            return saveTokenToDatabase(token);
+          });
+      } else {
+        messaging()
+          .getToken()
+          .then((token) => {
+            return saveTokenToDatabase(token);
+          });
+      }
+
+      // Listen to whether the token changes
+      return messaging().onTokenRefresh((token) => {
+        saveTokenToDatabase(token);
+      });
     } else if (route.params) {
       setUser(route.params);
+      if (Platform.OS == 'ios') {
+        messaging()
+          .getAPNSToken()
+          .then((token) => {
+            console.log(token);
+            return saveTokenToDatabase(token);
+          });
+      } else {
+        messaging()
+          .getToken()
+          .then((token) => {
+            return saveTokenToDatabase(token);
+          });
+      }
+
+      // Listen to whether the token changes
+      return messaging().onTokenRefresh((token) => {
+        saveTokenToDatabase(token);
+      });
     }
     return () => (mounted = false);
   }, []);
@@ -103,27 +144,33 @@ function Home_navigator({route, navigation}) {
     }
   }, []);
   React.useEffect(() => {
-    // Get the device token
-    if (Platform.OS == 'ios') {
-      messaging()
-        .getAPNSToken()
-        .then((token) => {
-          return saveTokenToDatabase(token);
-        });
-    } else {
-      messaging()
-        .getToken()
-        .then((token) => {
-          return saveTokenToDatabase(token);
-        });
+    async function requestUserPermission() {
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        console.log('Authorization status:', authStatus);
+      }
     }
+    async function checkApplicationPermission() {
+      const authorizationStatus = await messaging().requestPermission();
 
-    // Listen to whether the token changes
-    return messaging().onTokenRefresh((token) => {
-      saveTokenToDatabase(token);
-    });
+      if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+        console.log('User has notification permissions enabled.');
+      } else if (
+        authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL
+      ) {
+        console.log('User has provisional notification permissions.');
+      } else {
+        requestUserPermission();
+      }
+    }
+    if (Platform.OS == 'ios') {
+      checkApplicationPermission();
+    }
   }, []);
-
   return (
     <>
       {!user || isLoading ? (
@@ -173,11 +220,7 @@ function Home_navigator({route, navigation}) {
             inactiveTintColor: 'black',
           }}>
           <Tab.Screen name="홈" component={Home} initialParams={user} />
-          <Tab.Screen
-            name="고객채팅"
-            component={Chat_list}
-            initialParams={user}
-          />
+          <Tab.Screen name="고객채팅" component={Test} initialParams={user} />
           <Tab.Screen
             name=" "
             component={Work_register}

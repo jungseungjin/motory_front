@@ -262,7 +262,7 @@ function Login({navigation}) {
       </LoginView>
       <LoginView2>
         <FindView>
-          <Button3
+          {/*<Button3
             style={{backgroundColor: '#FEE500', borderRadius: 4}}
             onPress={() => {}}>
             <Image
@@ -275,7 +275,7 @@ function Login({navigation}) {
             <Image
               source={require('../../assets/image/naver_logo.png')}></Image>
             <Button3Text style={{color: 'white'}}>네이버로그인</Button3Text>
-          </Button3>
+          </Button3>*/}
         </FindView>
         <FindView>
           <Button2

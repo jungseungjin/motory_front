@@ -249,6 +249,9 @@ function Store({navigation, route}) {
   const [jibunAddress, setJibunAddress] = React.useState('');
   const [roadAddress, setRoadAddress] = React.useState('');
   const [addressDetail, setAddressDetail] = React.useState('');
+
+  const [storeNumber, setStoreNumber] = React.useState('');
+
   const [storeRegister, setStoreRegister] = React.useState('');
   const [category, setCategory] = React.useState('');
 
@@ -315,6 +318,7 @@ function Store({navigation, route}) {
       birthday,
       address,
       addressDetail,
+      storeNumber,
       logoUri,
       storeUri,
       registerUri,
@@ -495,6 +499,7 @@ function Store({navigation, route}) {
               setAddressDetail(result.data[0].store_address_detail);
               setStoreName(result.data[0].store_name);
               setStoreUri(result.data[0].store_image);
+              setStoreNumber(result.data[0].store_number);
               setLogoUri(result.data[0].store_logo_image);
               setStoreCeo(result.data[0].store_ceo);
               setCategory(result.data[0].store_category);
@@ -672,7 +677,7 @@ function Store({navigation, route}) {
               </MidmidtopContainer>
               <MidmidbottomContainer>
                 <MidmidInput
-                  placeholder={moment().format('YYYY.MM.DD')}
+                  placeholder={'숫자만 입력해주세요.'}
                   keyboardType={'number-pad'}
                   value={birthday}
                   autoCapitalize={'none'}
@@ -727,11 +732,25 @@ function Store({navigation, route}) {
             </MidmidContainer>
             <MidmidContainer>
               <MidmidtopContainer>
+                <MidmidText>매장 전화번호</MidmidText>
+              </MidmidtopContainer>
+              <MidmidbottomContainer>
+                <MidmidInput
+                  keyboardType={'number-pad'}
+                  placeholder={'숫자만 입력해주세요.'}
+                  value={storeNumber}
+                  autoCapitalize={'none'}
+                  onChangeText={(value) => setStoreNumber(value)}></MidmidInput>
+              </MidmidbottomContainer>
+            </MidmidContainer>
+            <MidmidContainer>
+              <MidmidtopContainer>
                 <MidmidText>사업자등록번호</MidmidText>
               </MidmidtopContainer>
               <MidmidbottomContainer>
                 <MidmidInput
                   keyboardType={'number-pad'}
+                  placeholder={'숫자만 입력해주세요.'}
                   value={storeRegister}
                   autoCapitalize={'none'}
                   onChangeText={(value) =>

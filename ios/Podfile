@@ -1,14 +1,21 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
-
+$FirebaseSDKVersion = '7.0.0'
 platform :ios, '10.0'
 
 target 'motory_owner' do
   config = use_native_modules!
+
   use_react_native!(:path => config["reactNativePath"])
 
+
   # add the Firebase pod for Google Analytics
+  #pod 'react-native-image-crop-picker', :path => '../node_modules/react-native-image-crop-picker/ios'
   pod 'Firebase/Analytics'
+  #pod 'Firebase/Messaging'
+  #pod 'Firebase/InAppMessaging'
+  pod 'Firebase/Auth'
+  pod 'RNFBMessaging', :path => '../node_modules/@react-native-firebase/messaging'
   # add pods for any other desired Firebase products
   # https://firebase.google.com/docs/ios/setup#available-pods
   target 'motory_ownerTests' do

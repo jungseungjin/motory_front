@@ -66,7 +66,7 @@ const MidSellectView = styled.View`
   flex-direction: row;
   width: 90%;
   margin: 0 auto;
-  padding: 10px 0;
+  padding: 10px 0px;
   align-items: center;
   justify-content: flex-start;
 `;

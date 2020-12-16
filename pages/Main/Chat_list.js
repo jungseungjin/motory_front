@@ -115,11 +115,15 @@ const MidmidContainer_right_mid_Text = styled.Text`
 `;
 const MidmidContainer_right_mid_image = styled.Image`
   margin: auto;
-  width: 20;
-  height: 20;
+  width: 20px;
+  height: 20px;
 `;
-function Chat_list({navigation}) {
+function Chat_list({navigation, route}) {
   const [page, setPage] = React.useState(0);
+  React.useEffect(() => {
+    navigation.goBack();
+    alert('준비중입니다.');
+  }, []);
   return (
     <Container>
       <TopContainer>
@@ -156,24 +160,25 @@ function Chat_list({navigation}) {
         </ToptopContainer>
       </TopContainer>
       <MidContainer>
-        <MidmidContainer onPress={()=>{navigation.navigate('Chat')}}>
+        <MidmidContainer
+          onPress={() => {
+            navigation.navigate('Chat');
+          }}>
           <MidmidContainer_left>
             <MidmidContainer_left_image
               source={require('../../assets/image/Group24.png')}></MidmidContainer_left_image>
           </MidmidContainer_left>
           <MidmidContainer_mid>
             <MidmidContainer_mid_top_Text>
-              백준열 고객 / 차종 : 기아 스팅어
+              *** 고객 / 차종 : ***
             </MidmidContainer_mid_top_Text>
-            <MidmidContainer_mid_mid_Text>
-              보통 에어댐에 추가적으로 립을 많이 장착하시는분
-            </MidmidContainer_mid_mid_Text>
+            <MidmidContainer_mid_mid_Text>****</MidmidContainer_mid_mid_Text>
           </MidmidContainer_mid>
           <MidmidContainer_right>
             {page == 0 ? (
               <>
                 <MidmidContainer_right_Text>
-                  오후 8:09
+                  오후 ***
                 </MidmidContainer_right_Text>
                 <MidmidContainer_right_mid>
                   <MidmidContainer_right_mid_Text>

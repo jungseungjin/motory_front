@@ -195,8 +195,10 @@ function Work({navigation, route}) {
         //에러
         setIsLoading(false);
         alert(result.data[0].message);
-      } else {
+      } else if (result.data[0].type == 3) {
         //데이터가 없을때도 고려
+        alert('등록된 작업이 없습니다.');
+      } else {
         let page0_data = [];
         let page1_data = [];
         let page2_data = [];

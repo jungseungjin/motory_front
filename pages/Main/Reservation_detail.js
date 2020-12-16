@@ -469,7 +469,7 @@ function Reservation_detail({navigation, route}) {
                   전화번호{' '}
                 </MidContainer_4_View_Mid_Right_View_Text>
                 <MidContainer_4_View_Mid_Right_View_Text2>
-                  MOTOToooo-----???
+                  {route.params.stores[0].store_number}
                 </MidContainer_4_View_Mid_Right_View_Text2>
               </MidContainer_4_View_Mid_Right_View>
               <MidContainer_4_View_Mid_Right_View>

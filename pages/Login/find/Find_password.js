@@ -20,6 +20,8 @@ import Domain from '../../../net/Domain';
 import Key from '../../../net/Key';
 import axios from 'axios';
 import {ActivityIndicator} from 'react-native';
+import auth from '@react-native-firebase/auth';
+import moment from 'moment';
 const Input = styled.TextInput`
   width: 90%;
   border: 1px solid #000000;
@@ -39,13 +41,58 @@ const Container_act = styled.View`
   justify-content: center;
   align-items: center;
 `;
+
+const PhoneView2_view = styled.View`
+  flex-direction: row;
+  border: 1px solid #aaaaaa;
+`;
+
+const PhoneView2_input = styled.TextInput``;
+const PhoneView2_text = styled.Text``;
 function Find_password({navigation}) {
+  const [confirm, setConfirm] = React.useState(null);
+  const [code, setCode] = React.useState(''); //휴대폰 인증값
+
   const [idInput, setIdInput] = React.useState(''); //아이디
   const [phoneInput, setPhoneInput] = React.useState(''); //휴대폰번호
   const [phoneSend, setPhoneSendInput] = React.useState(0); //휴대폰번호인증버튼 눌렀는지
   const [phoneCheckInput, setPhoneCheckInput] = React.useState(''); //휴대폰 인증값
   const [phoneCheckAuth, setPhoneCheckAuth] = React.useState(false); //휴대폰인증버튼을 눌러서 인증받았는지
   const [isLoading, setIsLoading] = React.useState(false);
+  const [codeTime, setCodeTime] = React.useState(''); //인증번호 시간
+
+  React.useEffect(() => {
+    if (codeTime && codeTime != '00:00') {
+      setTimeout(() => {
+        setCodeTime(
+          moment(codeTime, 'mm:ss').add(-1, 'seconds').format('mm:ss'),
+        );
+      }, 1000);
+    }
+  }, [codeTime]);
+  // Handle the button press
+  async function signInWithPhoneNumber(phoneNumber) {
+    try {
+      console.log(phoneNumber);
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      setConfirm(confirmation);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function confirmCode() {
+    try {
+      let result = await confirm.confirm(code);
+      setPhoneCheckAuth(true);
+      alert('완료');
+    } catch (error) {
+      setPhoneCheckAuth(false);
+      alert('인증번호를 확인해주세요.');
+      console.log(error);
+    }
+  }
+
   const search = async function () {
     if (phoneSend && phoneCheckAuth) {
       //휴대폰번호인증버튼 눌렀고 인증버튼눌러서 인증받았으면
@@ -104,7 +151,7 @@ function Find_password({navigation}) {
                   dataDetectorTypes={'phoneNumber'}
                   keyboardType={'number-pad'}
                   style={{zIndex: -5000, width: '65%', borderColor: 'black'}}
-                  placeholder={'휴대폰번호'}
+                  placeholder={'휴대폰번호(숫자만 입력해주세요.)'}
                   value={phoneInput}
                   onChangeText={(value) => {
                     setPhoneInput(value);
@@ -112,8 +159,12 @@ function Find_password({navigation}) {
                 <Auth
                   style={{color: '#7E88E4', borderColor: '#7E88E4'}}
                   onPress={() => {
-                    alert('인증번호 전송');
+                    let new_num = phoneInput;
+                    new_num = new_num.replace(0, '');
+                    signInWithPhoneNumber('+82' + new_num);
                     setPhoneSendInput(1);
+                    setCodeTime(moment('0300', 'mmss').format('mm:ss'));
+                    alert('인증번호 전송');
                   }}>
                   <AuthText style={{color: '#7E88E4'}}>인증</AuthText>
                 </Auth>
@@ -134,7 +185,11 @@ function Find_password({navigation}) {
                 <Auth
                   style={{color: 'black', borderColor: 'black'}}
                   onPress={() => {
-                    setPhoneSendInput(phoneSend + 1);
+                    let new_num = phoneInput;
+                    new_num = new_num.replace(0, '');
+                    signInWithPhoneNumber('+82' + new_num);
+                    setPhoneSendInput(1);
+                    setCodeTime(moment('0300', 'mmss').format('mm:ss'));
                     alert('인증번호 전송');
                   }}>
                   <AuthText style={{color: 'black'}}>재전송</AuthText>
@@ -162,21 +217,47 @@ function Find_password({navigation}) {
           </PhoneView>
           {phoneSend ? (
             <PhoneView>
-              <Input
-                dataDetectorTypes={'phoneNumber'}
-                keyboardType={'number-pad'}
-                style={{zIndex: -5000, width: '65%', borderColor: 'black'}}
-                placeholder={'인증번호'}
-                value={phoneCheckInput}
-                onChangeText={(value) => {
-                  setPhoneCheckInput(value);
-                }}></Input>
+              <PhoneView2_view
+                style={{
+                  marginTop: '5%',
+                  zIndex: -5000,
+                  width: '65%',
+                  height: 50,
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #aaaaaa',
+                  borderRadius: 5,
+                  borderColor: 'black',
+                }}>
+                <PhoneView2_input
+                  style={{
+                    marginLeft: '2%',
+                    width: '80%',
+                  }}
+                  dataDetectorTypes={'phoneNumber'}
+                  keyboardType={'number-pad'}
+                  placeholder={'인증번호'}
+                  value={code}
+                  onChangeText={(value) => {
+                    setCode(value);
+                  }}></PhoneView2_input>
+                <PhoneView2_text
+                  style={{
+                    marginTop: 'auto',
+                    marginBottom: 'auto',
+                    color: 'red',
+                  }}>
+                  {codeTime}
+                </PhoneView2_text>
+              </PhoneView2_view>
               <Auth
                 style={{color: 'black', borderColor: 'black'}}
                 onPress={() => {
-                  setPhoneCheckAuth(true);
-                  alert('인증번호 확인');
-                  Keyboard.dismiss();
+                  if (codeTime != '00:00') {
+                    confirmCode();
+                    Keyboard.dismiss();
+                  } else {
+                    alert('시간초과');
+                  }
                 }}>
                 <AuthText style={{color: 'black'}}>완료</AuthText>
               </Auth>
