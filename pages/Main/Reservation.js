@@ -420,6 +420,13 @@ function Reservation({navigation, route}) {
                   {moment(item, 'HHmm').format('HH:mm A')}
                 </BottomBottomContainer_nest_left_text>
               </BottomBottomContainer_nest_left>
+              {
+                (new_array = dayData.find(function (element) {
+                  if (element.reservation_start_time == item) {
+                    return true;
+                  }
+                }))
+              }
               {dayData.map((item2) =>
                 item2.reservation_start_time == item ? (
                   <BottomBottomContainer_nest_right
