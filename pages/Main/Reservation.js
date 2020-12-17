@@ -7,7 +7,7 @@ import Key from '../../net/Key';
 import axios from 'axios';
 import Container_act from '../../components/Main/Container_act';
 import {LocaleConfig} from 'react-native-calendars';
-import {add} from 'react-native-reanimated';
+import {add, set} from 'react-native-reanimated';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -81,11 +81,20 @@ const BottomTopContainer_Text = styled.Text`
   border: 1px solid #ff00ff;
   margin: 0 auto 0 auto;
 `;
+const BottomTopContainer_TextRight = styled.Text`
+  color: #ffffff;
+  border: 1px solid #ff00ff;
+`;
 const BottomBottomContainer = styled.ScrollView`
   flex: 5;
   background: #212055;
 `;
 const BottomBottomContainer_nest = styled.View`
+  height: 100px;
+  border: 1px solid #ff00ff;
+  flex-direction: row;
+`;
+const BottomBottomContainer_nest_touch = styled.TouchableOpacity`
   height: 100px;
   border: 1px solid #ff00ff;
   flex-direction: row;
@@ -183,6 +192,9 @@ function Reservation({navigation, route}) {
     moment().format('YYYY-MM'),
   );
   const [workTime, setWorkTime] = React.useState([]);
+  const [lockTime, setLockTime] = React.useState([]);
+  const [, updateState] = React.useState();
+  const forceUpdate = React.useCallback(() => updateState({}), []);
   const get_data_date = async function (data) {
     try {
       setIsLoading(true);
@@ -275,8 +287,83 @@ function Reservation({navigation, route}) {
       alert(err);
     }
   };
+
+  //예약불가시간 가져오기
+  const get_lock_time = async function (data) {
+    try {
+      setIsLoading(true);
+      if (data == null || data == undefined) {
+        data = moment().format('YYYY-MM-DD');
+      }
+      let search_date = moment(data).format('YYYY-MM-DD');
+      let url =
+        Domain +
+        'lock_time_date' +
+        '?key=' +
+        Key +
+        '&user_id=' +
+        route.params.user_id +
+        '&date=' +
+        search_date;
+      let result = await axios.get(url);
+
+      if (result.data[0].type == 0) {
+        //에러
+        setIsLoading(false);
+        alert(result.data[0].message);
+      } else if (result.data[0]._id == 'null') {
+        //빈데이터
+        setIsLoading(false);
+      } else {
+        setLockTime(result.data[0].lock_time);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setIsLoading(false);
+      console.log(err);
+      alert(err);
+    }
+  };
+  //예약불가시간 저장하기
+  const save_lock_time = async function (date) {
+    try {
+      //뒷단에 스토어아이디값,날짜비교해서 있으면 업데이트 없으면 저장
+      setIsLoading(true);
+      if (date == null || date == undefined) {
+        date = moment().format('YYYY-MM-DD');
+      }
+      let search_date = moment(date).format('YYYY-MM-DD');
+
+      let url = Domain + 'lock_time_date/';
+      let data = {
+        user_id: route.params.user_id,
+        date: search_date,
+        lock_time: lockTime,
+        key: Key,
+      };
+      let result = await axios.post(url, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (result.data.type == 0) {
+        //안됨
+        setIsLoading(false);
+        alert(result.data.message);
+      } else if (result.data.type == 1) {
+        setIsLoading(false);
+        get_data_date(data);
+        get_lock_time(data);
+        alert('저장완료');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   React.useEffect(() => {
     get_data_date(); //오늘의 예약일정
+    get_lock_time(); //오늘의 예약불가시간
     get_data_store(); //영업시간이 언제부터 언제까지인지 알아야해서 필요 한번 호출하고 끝
     get_data_month(); //이달의 예약일정
   }, []);
@@ -403,7 +490,9 @@ function Reservation({navigation, route}) {
               //다음달로 옮기고 선택했을 때 CalendarArray 의 data를바꿔줘
               setCalendarArray(data);
               setSelectDay(day.dateString);
+              setLockTime([]);
               get_data_date(day.dateString);
+              get_lock_time(day.dateString);
               //console.log(calendarArray);
             }}
             // 날짜를 길게(2~3초) 누르면 실행되는 함수. 기본값은 undefined입니다.
@@ -465,6 +554,36 @@ function Reservation({navigation, route}) {
       <BottomContainer>
         <BottomTopContainer>
           <BottomTopContainer_Text>예약세부일정</BottomTopContainer_Text>
+          {lockTime ? (
+            <BottomTopContainer_TextRight
+              onPress={() => {
+                let chk_date = calendarArray;
+                let chk_key;
+                for (var key in chk_date) {
+                  if (
+                    Object.entries(chk_date[key]).toString() ===
+                      Object.entries({
+                        selected: true,
+                        selectedColor: 'blue',
+                      }).toString() ||
+                    Object.entries(chk_date[key]).toString() ===
+                      Object.entries({
+                        marked: true,
+                        selected: true,
+                        selectedColor: 'blue',
+                      }).toString()
+                  ) {
+                    //이때의 key값 가져오기
+                    chk_key = key;
+                  }
+                }
+                save_lock_time(chk_key);
+              }}>
+              저장
+            </BottomTopContainer_TextRight>
+          ) : (
+            <BottomTopContainer_TextRight></BottomTopContainer_TextRight>
+          )}
         </BottomTopContainer>
         <BottomBottomContainer>
           {storeOneData.map((item) =>
@@ -519,8 +638,44 @@ function Reservation({navigation, route}) {
                   ) : null,
                 )}
               </BottomBottomContainer_nest>
+            ) : lockTime.indexOf(item) != -1 ? (
+              <BottomBottomContainer_nest_touch
+                //시간잠금에 빼야됨
+                onPress={() => {
+                  let new_array = lockTime;
+                  if (new_array.indexOf(item) != -1) {
+                    new_array.splice(new_array.indexOf(item), 1);
+                    setLockTime(new_array);
+                    forceUpdate();
+                  } else {
+                  }
+                  //렌더시켜줘야 보이는데...?
+                }}
+                key={item}
+                style={{backgroundColor: 'gray'}}>
+                <BottomBottomContainer_nest_left>
+                  <BottomBottomContainer_nest_left_text style={{marginTop: 10}}>
+                    {moment(item, 'HHmm').format('HH:mm A')}
+                  </BottomBottomContainer_nest_left_text>
+                </BottomBottomContainer_nest_left>
+                <BottomBottomContainer_nest_right>
+                  <BottomBottomContainer_nest_right_image
+                    source={require('../../assets/image/gray_bar.png')}></BottomBottomContainer_nest_right_image>
+                </BottomBottomContainer_nest_right>
+              </BottomBottomContainer_nest_touch>
             ) : (
-              <BottomBottomContainer_nest key={item}>
+              <BottomBottomContainer_nest_touch
+                key={item}
+                onPress={() => {
+                  let new_array = lockTime;
+                  if (new_array.indexOf(item) != -1) {
+                  } else {
+                    //시간잠금에 추가
+                    new_array.push(item);
+                    setLockTime(new_array);
+                    forceUpdate();
+                  }
+                }}>
                 <BottomBottomContainer_nest_left>
                   <BottomBottomContainer_nest_left_text style={{marginTop: 10}}>
                     {moment(item, 'HHmm').format('HH:mm A')}
@@ -530,7 +685,7 @@ function Reservation({navigation, route}) {
                   <BottomBottomContainer_nest_right_image
                     source={require('../../assets/image/green_bar.png')}></BottomBottomContainer_nest_right_image>
                 </BottomBottomContainer_nest_right>
-              </BottomBottomContainer_nest>
+              </BottomBottomContainer_nest_touch>
             ),
           )}
         </BottomBottomContainer>
